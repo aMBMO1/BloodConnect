@@ -74,3 +74,35 @@ def profile(request):
         })
     else:
         return redirect('admin:index')
+def user_login(request):
+    if request.user.is_authenticated:
+        return redirect('core:home')
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user     = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, f'Welcome back, {user.username}!')
+                if hasattr(user, 'donneur'):
+                    return redirect('donations:dashboard')
+                elif hasattr(user, 'hopital'):
+                    return redirect('hospitals:dashboard')
+                elif user.is_superuser:
+                    return redirect('admin_panel:dashboard')
+                else:
+                    return redirect('core:home')
+            else:
+                messages.error(request, 'Invalid username or password!')
+    else:
+        form = LoginForm()
+    return render(request, 'core/login.html', {'form': form})
+
+
+def user_logout(request):
+    logout(request)
+    messages.success(request, 'Logged out!')
+    return redirect('core:home')
+
