@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h3 class="fw-bold mb-4">
+    🩸 Dashboard —
+    <span class="badge bg-danger">{{ donneur.groupe_sanguin }}</span>
+</h3>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow text-center border-danger">
+            <div class="card-body">
+                <h2 class="text-danger fw-bold">{{ total_dons }}</h2>
+                <p class="text-muted mb-0">Total Donations</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow text-center border-warning">
+            <div class="card-body">
+                <h2 class="text-warning fw-bold">{{ demandes.count }}</h2>
+                <p class="text-muted mb-0">Urgent Calls</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow text-center
+             {% if is_eligible %}border-success{% else %}border-secondary{% endif %}">
+            <div class="card-body">
+                {% if is_eligible %}
+                    <h2 class="text-success fw-bold">✓</h2>
+                    <p class="text-muted mb-0">Eligible</p>
+                {% else %}
+                    <h2 class="text-secondary fw-bold">✗</h2>
+                    <p class="text-muted mb-0">Not Eligible</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow text-center border-info">
+            <div class="card-body">
+                <h2 class="text-info fw-bold">{{ inscriptions.count }}</h2>
+                <p class="text-muted mb-0">Campaigns</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if not is_eligible %}
+    <div class="alert alert-warning">
+        <i class="bi bi-clock"></i>
+        Next eligible date: <strong>{{ next_date }}</strong>
+    </div>
+{% else %}
+    <div class="alert alert-success">
+        <i class="bi bi-check-circle"></i>
+        You are eligible to donate!
+        <a href="{% url 'donations:enregistrer_don' %}"
+           class="btn btn-success btn-sm ms-3">
+            Record Donation
+        </a>
+    </div>
+{% endif %}
+
+<div class="row g-4">
+
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">Urgent Calls for You</h5>
+            </div>
+            <div class="card-body">
+                {% if demandes %}
+                    {% for demande in demandes|slice:":3" %}
+                        <div class="d-flex justify-content-between
+                                    align-items-center border-bottom py-2">
+                            <div>
+                                <span class="badge bg-danger me-2">
+                                    {{ demande.groupe_sanguin }}
+                                </span>
+                                {{ demande.hopital.nom }}
+                                <small class="text-muted d-block">
+                                    Deadline: {{ demande.delai }}
+                                </small>
+                            </div>
+                            <a href="{% url 'donations:repondre_appel' demande.id %}"
+                               class="btn btn-sm btn-outline-danger">
+                                Respond
+                            </a>
+                        </div>
+                    {% endfor %}
+                    <a href="{% url 'donations:appels_urgents' %}"
+                       class="btn btn-danger btn-sm w-100 mt-2">
+                        View All
+                    </a>
+                {% else %}
+                    <p class="text-muted text-center py-3">
+                        No urgent calls right now.
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Recent Donations</h5>
+            </div>
+            <div class="card-body">
+                {% if dons %}
+                    {% for don in dons|slice:":4" %}
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <div>
+                                <strong>{{ don.hopital.nom }}</strong>
+                                <small class="text-muted d-block">
+                                    {{ don.date_don }}
+                                </small>
+                            </div>
+                            {% if don.valide %}
+                                <span class="badge bg-success">Validated</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Pending</span>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <a href="{% url 'donations:mes_dons' %}"
+                       class="btn btn-dark btn-sm w-100 mt-2">
+                        View All
+                    </a>
+                {% else %}
+                    <p class="text-muted text-center py-3">No donations yet.</p>
+                    <a href="{% url 'donations:enregistrer_don' %}"
+                       class="btn btn-outline-danger w-100">
+                        Record First Donation
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

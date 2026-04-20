@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">🏥 Hospital Profile</h5>
+            </div>
+            <div class="card-body p-4">
+                <table class="table table-borderless">
+                    <tr>
+                        <td><strong>Username:</strong></td>
+                        <td>{{ user.username }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Email:</strong></td>
+                        <td>{{ user.email }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Hospital:</strong></td>
+                        <td>{{ hopital.nom }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Address:</strong></td>
+                        <td>{{ hopital.adresse }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>City:</strong></td>
+                        <td>{{ hopital.ville }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>License:</strong></td>
+                        <td>{{ hopital.agrement }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Status:</strong></td>
+                        <td>
+                            {% if hopital.valide %}
+                                <span class="badge bg-success">Validated</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">
+                                    Pending
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+                <a href="{% url 'hospitals:dashboard' %}" class="btn btn-primary">
+                    Go to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

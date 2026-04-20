@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card shadow text-center">
+            <div class="card-body p-4">
+                <div class="display-1 mb-3">👤</div>
+                <h4 class="fw-bold">{{ user.username }}</h4>
+                <p class="text-muted">{{ user.email }}</p>
+                <span class="badge bg-danger fs-5 mb-3">
+                    {{ donneur.groupe_sanguin }}
+                </span>
+                <hr/>
+                <table class="table table-borderless text-start">
+                    <tr>
+                        <td><strong>Gender:</strong></td>
+                        <td>{{ donneur.get_sexe_display }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Birthday:</strong></td>
+                        <td>{{ donneur.date_naissance }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>City:</strong></td>
+                        <td>{{ donneur.ville }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Status:</strong></td>
+                        <td>
+                            {% if donneur.actif %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">Edit Profile</h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ field.label }}</label>
+                            {{ field }}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-danger">
+                        Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

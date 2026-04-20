@@ -1,0 +1,32 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card {
+    border-radius: 12px;
+}
+
+.card:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.badge {
+    font-size: 0.85rem;
+}
+
+.progress {
+    border-radius: 10px;
+}
+
+.btn {
+    border-radius: 8px;
+}
+
+footer {
+    margin-top: auto;
+}

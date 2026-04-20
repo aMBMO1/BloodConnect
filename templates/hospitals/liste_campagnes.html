@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h3 class="fw-bold mb-4">📅 Blood Donation Campaigns</h3>
+
+{% if campagnes %}
+    <div class="row g-3">
+        {% for item in campagnes %}
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h5 class="fw-bold">{{ item.obj.nom }}</h5>
+                        <p class="text-muted mb-1">
+                            <i class="bi bi-hospital"></i>
+                            {{ item.obj.hopital.nom }}
+                        </p>
+                        <p class="text-muted mb-1">
+                            <i class="bi bi-calendar"></i>
+                            {{ item.obj.date }}
+                        </p>
+                        <p class="text-muted mb-2">
+                            <i class="bi bi-geo-alt"></i>
+                            {{ item.obj.lieu }}
+                        </p>
+                        <p class="mb-2">
+                            <strong>Blood Types:</strong>
+                            {{ item.obj.groupes_cibles }}
+                        </p>
+
+                        <div class="d-flex justify-content-between mb-2">
+                            <small class="text-muted">
+                                {{ item.filled }} / {{ item.total }} slots
+                            </small>
+                            {% if item.est_pleine %}
+                                <span class="badge bg-danger">Full</span>
+                            {% else %}
+                                <span class="badge bg-success">
+                                    {{ item.restantes }} left
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <!-- ✅ No JS no % issue — use Bootstrap w- classes -->
+                        <div class="progress mb-3" style="height:15px;">
+                            {% if item.percent >= 100 %}
+                                <div class="progress-bar bg-danger w-100"></div>
+                            {% elif item.percent >= 75 %}
+                                <div class="progress-bar bg-danger w-75"></div>
+                            {% elif item.percent >= 50 %}
+                                <div class="progress-bar bg-warning w-50"></div>
+                            {% elif item.percent >= 25 %}
+                                <div class="progress-bar bg-info w-25"></div>
+                            {% else %}
+                                <div class="progress-bar bg-success"
+                                     style="width:10px;"></div>
+                            {% endif %}
+                        </div>
+
+                        {% if not item.est_pleine %}
+                            <a href="{% url 'hospitals:inscrire_campagne' item.obj.id %}"
+                               class="btn btn-danger w-100">
+                                Register
+                            </a>
+                        {% else %}
+                            <button class="btn btn-secondary w-100" disabled>
+                                Full
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center py-5">
+        <div class="display-1">📅</div>
+        <h4 class="text-muted">No campaigns available</h4>
+    </div>
+{% endif %}
+
+{% endblock %}

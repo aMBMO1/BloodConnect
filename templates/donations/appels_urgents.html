@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h3 class="fw-bold mb-1">🚨 Urgent Blood Calls</h3>
+<p class="text-muted mb-4">
+    Your blood type:
+    <span class="badge bg-danger">{{ donneur.groupe_sanguin }}</span>
+</p>
+
+{% if not is_eligible %}
+    <div class="alert alert-warning">
+        You are not eligible to donate yet but you can still show interest.
+    </div>
+{% endif %}
+
+{% if demandes %}
+    <div class="row g-3">
+        {% for demande in demandes %}
+            <div class="col-md-6">
+                <div class="card shadow border-danger">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <span class="badge bg-danger fs-5">
+                                {{ demande.groupe_sanguin }}
+                            </span>
+                            <small class="text-muted">
+                                Deadline: {{ demande.delai }}
+                            </small>
+                        </div>
+                        <h5 class="mt-2">{{ demande.hopital.nom }}</h5>
+                        <p class="text-muted">{{ demande.hopital.ville }}</p>
+                        <p>{{ demande.description }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted">
+                                {{ demande.quantite }} pouches needed
+                            </span>
+                            {% if demande.id in already_responded %}
+                                <span class="badge bg-success">Responded ✓</span>
+                            {% else %}
+                                <a href="{% url 'donations:repondre_appel' demande.id %}"
+                                   class="btn btn-danger btn-sm">
+                                    Respond
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center py-5">
+        <div class="display-1">✅</div>
+        <h4 class="text-muted">No urgent calls for your blood type</h4>
+    </div>
+{% endif %}
+
+{% endblock %}

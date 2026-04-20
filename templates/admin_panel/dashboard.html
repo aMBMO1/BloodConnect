@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h3 class="fw-bold mb-4">⚙️ Admin Dashboard</h3>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-2">
+        <div class="card shadow text-center border-danger">
+            <div class="card-body">
+                <h2 class="text-danger fw-bold">{{ total_donneurs }}</h2>
+                <p class="text-muted mb-0 small">Donors</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card shadow text-center border-primary">
+            <div class="card-body">
+                <h2 class="text-primary fw-bold">{{ total_hopitaux }}</h2>
+                <p class="text-muted mb-0 small">Hospitals</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card shadow text-center border-success">
+            <div class="card-body">
+                <h2 class="text-success fw-bold">{{ total_dons }}</h2>
+                <p class="text-muted mb-0 small">Donations</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card shadow text-center border-warning">
+            <div class="card-body">
+                <h2 class="text-warning fw-bold">{{ hopitaux_non_valides }}</h2>
+                <p class="text-muted mb-0 small">Pending</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card shadow text-center border-dark">
+            <div class="card-body">
+                <h2 class="text-dark fw-bold">{{ total_demandes }}</h2>
+                <p class="text-muted mb-0 small">Active Requests</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card shadow text-center border-info">
+            <div class="card-body">
+                <h2 class="text-info fw-bold">{{ total_campagnes }}</h2>
+                <p class="text-muted mb-0 small">Campaigns</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <a href="{% url 'admin_panel:hopitaux_list' %}"
+           class="btn btn-outline-primary w-100 py-3">
+            🏥 Manage Hospitals
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'admin_panel:donneurs_list' %}"
+           class="btn btn-outline-danger w-100 py-3">
+            🩸 View Donors
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'admin_panel:statistiques' %}"
+           class="btn btn-outline-success w-100 py-3">
+            📊 Statistics
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'admin_panel:export_csv' %}"
+           class="btn btn-outline-dark w-100 py-3">
+            📥 Export CSV
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">Donations by Blood Type</h5>
+            </div>
+            <div class="card-body">
+                {% for item in dons_par_groupe %}
+                    <div class="d-flex justify-content-between
+                                align-items-center border-bottom py-2">
+                        <span class="badge bg-danger">{{ item.blood_type }}</span>
+                        <span>{{ item.count }} donations</span>
+                        <span class="badge bg-secondary">{{ item.percent }}%</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Active Requests by Blood Type</h5>
+            </div>
+            <div class="card-body">
+                {% for item in demandes_par_groupe %}
+                    <div class="d-flex justify-content-between
+                                align-items-center border-bottom py-2">
+                        <span class="badge bg-dark">{{ item.blood_type }}</span>
+                        <span>{{ item.count }} requests</span>
+                        <span class="badge bg-secondary">{{ item.percent }}%</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

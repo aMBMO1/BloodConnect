@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card shadow">
+            <div class="card-header bg-danger text-white text-center py-3">
+                <h4 class="mb-0">🩸 Login</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Username</label>
+                        {{ form.username }}
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Password</label>
+                        {{ form.password }}
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100 py-2">
+                        Login
+                    </button>
+                </form>
+                <hr/>
+                <div class="text-center">
+                    <a href="{% url 'core:register_donneur' %}"
+                       class="btn btn-outline-danger btn-sm me-2">
+                        Register as Donor
+                    </a>
+                    <a href="{% url 'core:register_hopital' %}"
+                       class="btn btn-outline-primary btn-sm">
+                        Register as Hospital
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

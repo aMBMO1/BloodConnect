@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold">🩸 My Donations ({{ total_dons }})</h3>
+    <a href="{% url 'donations:enregistrer_don' %}" class="btn btn-danger">
+        Record New
+    </a>
+</div>
+
+{% if dons %}
+    <div class="card shadow">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-danger">
+                    <tr>
+                        <th>#</th>
+                        <th>Hospital</th>
+                        <th>Date</th>
+                        <th>Notes</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for don in dons %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ don.hopital.nom }}</td>
+                            <td>{{ don.date_don }}</td>
+                            <td>{{ don.notes|default:"—" }}</td>
+                            <td>
+                                {% if don.valide %}
+                                    <span class="badge bg-success">Validated</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Pending</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% else %}
+    <div class="text-center py-5">
+        <div class="display-1">🩸</div>
+        <h4 class="text-muted">No donations yet</h4>
+        <a href="{% url 'donations:enregistrer_don' %}"
+           class="btn btn-danger mt-3">
+            Record First Donation
+        </a>
+    </div>
+{% endif %}
+
+{% endblock %}
