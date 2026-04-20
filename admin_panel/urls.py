@@ -24,11 +24,5 @@ urlpatterns = [
          views.donneurs_list,
          name='donneurs_list'),
 
-    path('export-csv/',
-         views.export_donneurs_csv,
-         name='export_csv'),
 
-    path('statistiques/',
-         views.statistiques,
-         name='statistiques'),
 ]
