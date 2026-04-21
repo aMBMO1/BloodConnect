@@ -2,7 +2,7 @@
 {% block content %}
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="fw-bold">🩸 My Donations ({{ total_dons }})</h3>
+    <h3 class="fw-bold"> My Donations ({{ total_dons }})</h3>
     <a href="{% url 'donations:enregistrer_don' %}" class="btn btn-danger">
         Record New
     </a>
@@ -43,7 +43,6 @@
     </div>
 {% else %}
     <div class="text-center py-5">
-        <div class="display-1">🩸</div>
         <h4 class="text-muted">No donations yet</h4>
         <a href="{% url 'donations:enregistrer_don' %}"
            class="btn btn-danger mt-3">

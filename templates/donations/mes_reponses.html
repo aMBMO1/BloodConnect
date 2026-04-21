@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h3 class="fw-bold mb-4">📋 My Responses</h3>
+<h3 class="fw-bold mb-4"> My Responses</h3>
 
 {% if reponses %}
     <div class="card shadow">
@@ -52,7 +52,6 @@
     </div>
 {% else %}
     <div class="text-center py-5">
-        <div class="display-1">📋</div>
         <h4 class="text-muted">No responses yet</h4>
         <a href="{% url 'donations:appels_urgents' %}"
            class="btn btn-danger mt-3">
