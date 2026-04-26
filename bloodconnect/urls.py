@@ -7,6 +7,6 @@ urlpatterns = [
     path('donations/',   include('donations.urls')),
     path('hospitals/',   include('hospitals.urls')),
     path('admin-panel/', include('admin_panel.urls')),
-    path('issues/', include('issues.urls')),
+      path('issues/', include('issues.urls', namespace='issues')),
 
 ]
