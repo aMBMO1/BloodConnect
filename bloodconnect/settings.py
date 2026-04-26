@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     'donations',
     'hospitals',
     'admin_panel',
+    'issues'
 ]
 
 MIDDLEWARE = [
