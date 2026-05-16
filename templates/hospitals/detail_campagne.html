@@ -22,6 +22,17 @@
                     {{ inscriptions.count }} / {{ campagne.capacite_totale }}
                 </p>
             </div>
+            <!-- Action buttons — hospital only -->
+<div class="d-flex gap-2 mb-4">
+    <a href="{% url 'hospitals:modifier_campagne' campagne.id %}"
+       class="btn btn-outline-primary">
+        ✏️ Edit Campaign
+    </a>
+    <a href="{% url 'hospitals:supprimer_campagne' campagne.id %}"
+       class="btn btn-outline-danger">
+        🗑️ Delete Campaign
+    </a>
+</div>
         </div>
     </div>
 </div>

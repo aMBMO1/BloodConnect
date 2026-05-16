@@ -1,3 +1,4 @@
+# donations/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -5,7 +6,7 @@ from django.contrib import messages
 from .models import Don, DemandeUrgente, ReponseAppel
 from .forms  import DonForm, ReponseAppelForm
 from .utils  import get_next_eligible_date, is_eligible, get_compatible_blood_types
-
+from datetime import date
 
 def get_donneur_or_redirect(request):
     if not hasattr(request.user, 'donneur'):
@@ -30,9 +31,9 @@ def dashboard(request):
         statut='active'
     ).order_by('-created_at')
 
-    inscriptions = donneur.inscriptions.select_related(
-        'campagne'
-    ).order_by('campagne__date')
+    inscriptions = donneur.inscriptions.select_related('campagne').filter(
+    campagne__date__gte=date.today()   # ✅ only future campaigns
+).order_by('campagne__date')
 
     context = {
         'donneur':      donneur,
@@ -52,11 +53,9 @@ def mes_dons(request):
     if redir:
         return redir
     dons = Don.objects.filter(donneur=donneur).order_by('-date_don')
-    context = {
-        'dons':       dons,
-        'total_dons': dons.count(),
-    }
-    return render(request, 'donations/mes_dons.html', context)
+    return render(request, 'donations/mes_dons.html', {
+        'dons': dons, 'total_dons': dons.count()
+    })
 
 
 @login_required
@@ -73,14 +72,14 @@ def enregistrer_don(request):
         if form.is_valid():
             don         = form.save(commit=False)
             don.donneur = donneur
+            don.valide = True  
             don.save()
             messages.success(request, 'Donation recorded! Thank you!')
             return redirect('donations:mes_dons')
     else:
         form = DonForm()
     return render(request, 'donations/enregistrer_don.html', {
-        'form':    form,
-        'donneur': donneur,
+        'form': form, 'donneur': donneur
     })
 
 
@@ -97,13 +96,12 @@ def appels_urgents(request):
     already_responded = ReponseAppel.objects.filter(
         donneur=donneur
     ).values_list('demande_id', flat=True)
-    context = {
+    return render(request, 'donations/appels_urgents.html', {
         'demandes':          demandes,
         'donneur':           donneur,
         'already_responded': already_responded,
         'is_eligible':       is_eligible(donneur),
-    }
-    return render(request, 'donations/appels_urgents.html', context)
+    })
 
 
 @login_required
@@ -112,15 +110,24 @@ def repondre_appel(request, demande_id):
     if redir:
         return redir
     demande = get_object_or_404(DemandeUrgente, id=demande_id)
+
+    compatible_groups = get_compatible_blood_types(donneur.groupe_sanguin)
+    if demande.groupe_sanguin not in compatible_groups:
+        messages.error(request, 'Your blood type is not compatible with this request.')
+        return redirect('donations:appels_urgents')
+
     if not is_eligible(donneur):
         messages.error(request, 'You are not eligible yet.')
         return redirect('donations:appels_urgents')
+
     if ReponseAppel.objects.filter(donneur=donneur, demande=demande).exists():
         messages.warning(request, 'Already responded!')
         return redirect('donations:appels_urgents')
+
     if demande.statut != 'active':
         messages.error(request, 'This request is closed.')
         return redirect('donations:appels_urgents')
+
     if request.method == 'POST':
         form = ReponseAppelForm(request.POST)
         if form.is_valid():
@@ -133,9 +140,7 @@ def repondre_appel(request, demande_id):
     else:
         form = ReponseAppelForm()
     return render(request, 'donations/repondre_appel.html', {
-        'form':    form,
-        'demande': demande,
-        'donneur': donneur,
+        'form': form, 'demande': demande, 'donneur': donneur
     })
 
 
@@ -148,3 +153,35 @@ def mes_reponses(request):
         donneur=donneur
     ).select_related('demande', 'demande__hopital').order_by('-date_reponse')
     return render(request, 'donations/mes_reponses.html', {'reponses': reponses})
+
+
+@login_required
+def modifier_don(request, don_id):
+    donneur, redir = get_donneur_or_redirect(request)
+    if redir:
+        return redir
+    don = get_object_or_404(Don, id=don_id, donneur=donneur)
+    if request.method == 'POST':
+        form = DonForm(request.POST, instance=don)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Donation updated!')
+            return redirect('donations:mes_dons')
+    else:
+        form = DonForm(instance=don)
+    return render(request, 'donations/modifier_don.html', {
+        'form': form, 'don': don
+    })
+
+
+@login_required
+def supprimer_don(request, don_id):
+    donneur, redir = get_donneur_or_redirect(request)
+    if redir:
+        return redir
+    don = get_object_or_404(Don, id=don_id, donneur=donneur)
+    if request.method == 'POST':
+        don.delete()
+        messages.success(request, 'Donation deleted.')
+        return redirect('donations:mes_dons')
+    return render(request, 'donations/supprimer_don.html', {'don': don})

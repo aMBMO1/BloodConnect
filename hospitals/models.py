@@ -1,18 +1,16 @@
+# hospitals/models.py
 from django.db import models
 from core.models import Hopital, Donneur
+from core.constants import BLOOD_TYPES, BLOOD_TYPE_VALUES
 
 
 class Campagne(models.Model):
-
-    hopital         = models.ForeignKey(
-                        Hopital,
-                        on_delete=models.CASCADE,
-                        related_name='campagnes'
-                      )
+    hopital         = models.ForeignKey(Hopital, on_delete=models.CASCADE, related_name='campagnes')
     nom             = models.CharField(max_length=200)
     date            = models.DateField()
     lieu            = models.CharField(max_length=200)
-    groupes_cibles  = models.CharField(max_length=100)
+    # Stored as a JSON list, e.g. ["A+", "O-"]
+    groupes_cibles  = models.JSONField(default=list)
     capacite_totale = models.PositiveIntegerField()
     created_at      = models.DateTimeField(auto_now_add=True)
 
@@ -32,17 +30,8 @@ class Campagne(models.Model):
 
 
 class Inscription(models.Model):
-
-    campagne         = models.ForeignKey(
-                            Campagne,
-                            on_delete=models.CASCADE,
-                            related_name='inscriptions'
-                       )
-    donneur          = models.ForeignKey(
-                            Donneur,
-                            on_delete=models.CASCADE,
-                            related_name='inscriptions'
-                       )
+    campagne         = models.ForeignKey(Campagne, on_delete=models.CASCADE, related_name='inscriptions')
+    donneur          = models.ForeignKey(Donneur, on_delete=models.CASCADE, related_name='inscriptions')
     creneau_horaire  = models.TimeField()
     date_inscription = models.DateTimeField(auto_now_add=True)
     present          = models.BooleanField(default=False)

@@ -1,91 +1,51 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="row justify-content-center">
-    <div class="col-md-7">
-        <div class="card shadow">
-            <div class="card-header bg-danger text-white text-center py-3">
-                <h4 class="mb-0">Register as Donor</h4>
-            </div>
-            <div class="card-body p-4">
-
-                {% if form.non_field_errors %}
-                    <div class="alert alert-danger">
-                        {% for error in form.non_field_errors %}
-                            <p class="mb-0">{{ error }}</p>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-
-                <form method="POST">
-                    {% csrf_token %}
-
-                    <h6 class="text-danger fw-bold mb-3">Account Information</h6>
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Username</label>
-                            {{ form.username }}
-                            {% if form.username.errors %}
-                                <div class="text-danger small">
-                                    {{ form.username.errors }}
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Email</label>
-                            {{ form.email }}
-                            {% if form.email.errors %}
-                                <div class="text-danger small">
-                                    {{ form.email.errors }}
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Password</label>
-                            {{ form.password }}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Confirm Password</label>
-                            {{ form.password2 }}
-                        </div>
-                    </div>
-
-                    <hr/>
-                    <h6 class="text-danger fw-bold mb-3">Medical Information</h6>
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold">Blood Type</label>
-                            {{ form.groupe_sanguin }}
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold">Gender</label>
-                            {{ form.sexe }}
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold">Date of Birth</label>
-                            {{ form.date_naissance }}
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">City</label>
-                        {{ form.ville }}
-                    </div>
-
-                    <button type="submit" class="btn btn-danger w-100 py-2">
-                        Create Account
-                    </button>
-                </form>
-
-                <div class="text-center mt-3">
-                    <a href="{% url 'core:login' %}" class="text-muted">
-                        Already have an account? Login
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold mb-0">My Donations ({{ total_dons }})</h3>
+    <a href="{% url 'donations:enregistrer_don' %}" class="btn btn-danger">+ Record New</a>
 </div>
+
+{% if dons %}
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead class="table-danger">
+            <tr>
+                <th>#</th>
+                <th>Hospital</th>
+                <th>Date</th>
+                <th>Notes</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for don in dons %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ don.hopital.nom }}</td>
+                <td>{{ don.date_don|date:"F j, Y" }}</td>
+                <td>{{ don.notes|default:"—" }}</td>
+                <td>
+                    {% if don.valide %}
+                        <span class="badge bg-success">Validated</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Pending</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'donations:modifier_don' don.id %}"
+                       class="btn btn-sm btn-outline-primary">✏️ Edit</a>
+                    <a href="{% url 'donations:supprimer_don' don.id %}"
+                       class="btn btn-sm btn-outline-danger">🗑️ Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info">No donations recorded yet.</div>
+{% endif %}
 
 {% endblock %}

@@ -1,32 +1,18 @@
+# core/models.py
 from django.db import models
 from django.contrib.auth.models import User
+from .constants import BLOOD_TYPES
 
 
 class Donneur(models.Model):
-
     GENDER_CHOICES = [
         ('M', 'Male'),
         ('F', 'Female'),
     ]
 
-    BLOOD_TYPES = [
-        ('O+',  'O+'),
-        ('O-',  'O-'),
-        ('A+',  'A+'),
-        ('A-',  'A-'),
-        ('B+',  'B+'),
-        ('B-',  'B-'),
-        ('AB+', 'AB+'),
-        ('AB-', 'AB-'),
-    ]
-
-    user  = models.OneToOneField(
-                        User,
-                        on_delete=models.CASCADE,
-                        related_name='donneur'
-                     )
-    groupe_sanguin = models.CharField(max_length=3,  choices=BLOOD_TYPES)
-    sexe           = models.CharField(max_length=1,  choices=GENDER_CHOICES)
+    user           = models.OneToOneField(User, on_delete=models.CASCADE, related_name='donneur')
+    groupe_sanguin = models.CharField(max_length=3, choices=BLOOD_TYPES)
+    sexe           = models.CharField(max_length=1, choices=GENDER_CHOICES)
     date_naissance = models.DateField()
     ville          = models.CharField(max_length=100)
     actif          = models.BooleanField(default=True)
@@ -40,12 +26,7 @@ class Donneur(models.Model):
 
 
 class Hopital(models.Model):
-
-    user = models.OneToOneField(
-                    User,
-                    on_delete=models.CASCADE,
-                    related_name='hopital'
-                 )
+    user       = models.OneToOneField(User, on_delete=models.CASCADE, related_name='hopital')
     nom        = models.CharField(max_length=200)
     adresse    = models.TextField()
     ville      = models.CharField(max_length=100)

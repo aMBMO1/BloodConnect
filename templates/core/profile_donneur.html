@@ -1,17 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
-
+ 
 <div class="row g-4">
+ 
+    {# ── Left card: info + status + deactivate ── #}
     <div class="col-md-4">
         <div class="card shadow text-center">
             <div class="card-body p-4">
+                <div class="mb-2">
+                    <i class="bi bi-person-circle fs-1 text-danger"></i>
+                </div>
                 <h4 class="fw-bold">{{ user.username }}</h4>
-                <p class="text-muted">{{ user.email }}</p>
+                <p class="text-muted mb-1">{{ user.email }}</p>
                 <span class="badge bg-danger fs-5 mb-3">
                     {{ donneur.groupe_sanguin }}
                 </span>
                 <hr/>
-                <table class="table table-borderless text-start">
+                <table class="table table-borderless text-start small">
                     <tr>
                         <td><strong>Gender:</strong></td>
                         <td>{{ donneur.get_sexe_display }}</td>
@@ -35,14 +40,40 @@
                         </td>
                     </tr>
                 </table>
+ 
+                <hr/>
+ 
+                {# ✅ Deactivate / Reactivate account #}
+                <form method="post" action="{% url 'core:toggle_actif' %}"
+                      onsubmit="return confirm('Are you sure you want to {% if donneur.actif %}deactivate{% else %}reactivate{% endif %} your account?')">
+                    {% csrf_token %}
+                    {% if donneur.actif %}
+                        <button type="submit" class="btn btn-outline-warning w-100">
+                            <i class="bi bi-pause-circle me-1"></i>
+                            Deactivate Account
+                        </button>
+                        <small class="text-muted d-block mt-1">
+                            You won't appear in urgent calls while inactive.
+                        </small>
+                    {% else %}
+                        <button type="submit" class="btn btn-outline-success w-100">
+                            <i class="bi bi-play-circle me-1"></i>
+                            Reactivate Account
+                        </button>
+                        <small class="text-muted d-block mt-1">
+                            You'll be visible to hospitals again.
+                        </small>
+                    {% endif %}
+                </form>
             </div>
         </div>
     </div>
-
+ 
+    {# ── Right card: edit form ── #}
     <div class="col-md-8">
         <div class="card shadow">
             <div class="card-header bg-danger text-white">
-                <h5 class="mb-0">Edit Profile</h5>
+                <h5 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Edit Profile</h5>
             </div>
             <div class="card-body p-4">
                 <form method="POST">
@@ -51,15 +82,24 @@
                         <div class="mb-3">
                             <label class="form-label fw-bold">{{ field.label }}</label>
                             {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger small mt-1">{{ field.errors }}</div>
+                            {% endif %}
                         </div>
                     {% endfor %}
-                    <button type="submit" class="btn btn-danger">
-                        Save Changes
+                    <button type="submit" class="btn btn-danger px-4">
+                        <i class="bi bi-check-circle me-1"></i> Save Changes
                     </button>
                 </form>
+                <a href="{% url 'donations:dashboard' %}"
+                   class="btn btn-outline-secondary w-100 mt-2">
+                    Cancel
+                </a>
             </div>
         </div>
     </div>
+ 
 </div>
-
+ 
 {% endblock %}
+ 

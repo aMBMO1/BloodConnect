@@ -1,19 +1,12 @@
+# donations/models.py
 from django.db import models
 from core.models import Donneur, Hopital
+from core.constants import BLOOD_TYPES
 
 
 class Don(models.Model):
-
-    donneur    = models.ForeignKey(
-                    Donneur,
-                    on_delete=models.CASCADE,
-                    related_name='dons'
-                 )
-    hopital    = models.ForeignKey(
-                    Hopital,
-                    on_delete=models.CASCADE,
-                    related_name='dons_recus'
-                 )
+    donneur    = models.ForeignKey(Donneur, on_delete=models.CASCADE, related_name='dons')
+    hopital    = models.ForeignKey(Hopital, on_delete=models.CASCADE, related_name='dons_recus')
     date_don   = models.DateField()
     notes      = models.TextField(blank=True)
     valide     = models.BooleanField(default=False)
@@ -29,36 +22,16 @@ class Don(models.Model):
 
 
 class DemandeUrgente(models.Model):
-
     STATUS_CHOICES = [
         ('active', 'Active'),
         ('closed', 'Closed'),
     ]
 
-    BLOOD_TYPES = [
-        ('O+',  'O+'),
-        ('O-',  'O-'),
-        ('A+',  'A+'),
-        ('A-',  'A-'),
-        ('B+',  'B+'),
-        ('B-',  'B-'),
-        ('AB+', 'AB+'),
-        ('AB-', 'AB-'),
-    ]
-
-    hopital        = models.ForeignKey(
-                        Hopital,
-                        on_delete=models.CASCADE,
-                        related_name='demandes'
-                     )
+    hopital        = models.ForeignKey(Hopital, on_delete=models.CASCADE, related_name='demandes')
     groupe_sanguin = models.CharField(max_length=3, choices=BLOOD_TYPES)
     quantite       = models.PositiveIntegerField()
     delai          = models.DateField()
-    statut         = models.CharField(
-                        max_length=20,
-                        choices=STATUS_CHOICES,
-                        default='active'
-                     )
+    statut         = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
     description    = models.TextField()
     created_at     = models.DateTimeField(auto_now_add=True)
 
@@ -72,29 +45,16 @@ class DemandeUrgente(models.Model):
 
 
 class ReponseAppel(models.Model):
-
     STATUS_CHOICES = [
         ('interested', 'Interested'),
         ('confirmed',  'Confirmed'),
         ('declined',   'Declined'),
     ]
 
-    donneur      = models.ForeignKey(
-                        Donneur,
-                        on_delete=models.CASCADE,
-                        related_name='reponses'
-                   )
-    demande      = models.ForeignKey(
-                        DemandeUrgente,
-                        on_delete=models.CASCADE,
-                        related_name='reponses'
-                   )
+    donneur      = models.ForeignKey(Donneur, on_delete=models.CASCADE, related_name='reponses')
+    demande      = models.ForeignKey(DemandeUrgente, on_delete=models.CASCADE, related_name='reponses')
     date_reponse = models.DateTimeField(auto_now_add=True)
-    statut       = models.CharField(
-                        max_length=20,
-                        choices=STATUS_CHOICES,
-                        default='interested'
-                   )
+    statut       = models.CharField(max_length=20, choices=STATUS_CHOICES, default='interested')
 
     def __str__(self):
         return f"{self.donneur.user.username} - {self.demande}"

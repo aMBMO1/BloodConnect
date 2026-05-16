@@ -1,40 +1,29 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import Donneur, Hopital
+from .constants import BLOOD_TYPES 
 
 
 class DonneurRegistrationForm(forms.Form):
 
     username = forms.CharField(
         max_length=150,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Username',
-        })
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'})
     )
     email = forms.EmailField(
-        widget=forms.EmailInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Email',
-        })
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'})
     )
     password = forms.CharField(
         label='Password',
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Password',
-        })
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'})
     )
     password2 = forms.CharField(
         label='Confirm Password',
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Confirm Password',
-        })
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm Password'})
     )
     groupe_sanguin = forms.ChoiceField(
         label='Blood Type',
-        choices=Donneur.BLOOD_TYPES,
+        choices=BLOOD_TYPES,  
         widget=forms.Select(attrs={'class': 'form-select'})
     )
     sexe = forms.ChoiceField(
@@ -44,18 +33,12 @@ class DonneurRegistrationForm(forms.Form):
     )
     date_naissance = forms.DateField(
         label='Date of Birth',
-        widget=forms.DateInput(attrs={
-            'class': 'form-control',
-            'type':  'date',
-        })
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
     )
     ville = forms.CharField(
         label='City',
         max_length=100,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'City',
-        })
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'City'})
     )
 
     def clean_username(self):
@@ -98,62 +81,37 @@ class HopitalRegistrationForm(forms.Form):
 
     username = forms.CharField(
         max_length=150,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Username',
-        })
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'})
     )
     email = forms.EmailField(
-        widget=forms.EmailInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Email',
-        })
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'})
     )
     password = forms.CharField(
         label='Password',
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Password',
-        })
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'})
     )
     password2 = forms.CharField(
         label='Confirm Password',
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Confirm Password',
-        })
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm Password'})
     )
     nom = forms.CharField(
         label='Hospital Name',
         max_length=200,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Hospital Name',
-        })
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Hospital Name'})
     )
     adresse = forms.CharField(
         label='Address',
-        widget=forms.Textarea(attrs={
-            'class': 'form-control',
-            'rows':  3,
-            'placeholder': 'Full Address',
-        })
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Full Address'})
     )
     ville = forms.CharField(
         label='City',
         max_length=100,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'City',
-        })
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'City'})
     )
     agrement = forms.CharField(
         label='License Number',
         max_length=100,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'License Number',
-        })
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'License Number'})
     )
 
     def clean_username(self):
@@ -198,30 +156,42 @@ class HopitalRegistrationForm(forms.Form):
         return hopital
 
 
-
-
-
 class EditDonneurForm(forms.ModelForm):
+    """Edit donor profile — actif is intentionally excluded here,
+    it's toggled separately via the toggle_actif view."""
 
     class Meta:
         model  = Donneur
-        fields = ['groupe_sanguin', 'sexe', 'date_naissance', 'ville', 'actif']
+        fields = ['groupe_sanguin', 'sexe', 'date_naissance', 'ville']  # ✅ actif removed
         widgets = {
             'groupe_sanguin': forms.Select(attrs={'class': 'form-select'}),
             'sexe':           forms.Select(attrs={'class': 'form-select'}),
-            'date_naissance': forms.DateInput(attrs={
-                'class': 'form-control',
-                'type':  'date',
-            }),
-            'ville': forms.TextInput(attrs={'class': 'form-control'}),
-            'actif': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'date_naissance': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'ville':          forms.TextInput(attrs={'class': 'form-control'}),
         }
         labels = {
             'groupe_sanguin': 'Blood Type',
             'sexe':           'Gender',
             'date_naissance': 'Date of Birth',
             'ville':          'City',
-            'actif':          'Available to Donate',
+        }
+
+
+class EditHopitalForm(forms.ModelForm):
+    """Edit hospital profile — agrement excluded, shouldn't change after registration."""
+
+    class Meta:
+        model  = Hopital
+        fields = ['nom', 'adresse', 'ville']  # ✅ agrement intentionally excluded
+        widgets = {
+            'nom':     forms.TextInput(attrs={'class': 'form-control'}),
+            'adresse': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'ville':   forms.TextInput(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            'nom':     'Hospital Name',
+            'adresse': 'Address',
+            'ville':   'City',
         }
 
 
@@ -229,14 +199,8 @@ class LoginForm(forms.Form):
 
     username = forms.CharField(
         max_length=150,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Username',
-        })
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'})
     )
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Password',
-        })
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'})
     )

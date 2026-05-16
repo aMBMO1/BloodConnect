@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card shadow border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">🗑️ Delete Donation</h5>
+            </div>
+            <div class="card-body text-center">
+                <p class="mb-1">Are you sure you want to delete this donation?</p>
+                <p class="fw-bold">{{ don.hopital.nom }} — {{ don.date_don }}</p>
+                <form method="post" class="d-flex justify-content-center gap-2 mt-3">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                    <a href="{% url 'donations:mes_dons' %}" class="btn btn-outline-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

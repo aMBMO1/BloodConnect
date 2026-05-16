@@ -64,15 +64,27 @@
     <div class="col-md-3">
         <a href="{% url 'admin_panel:donneurs_list' %}"
            class="btn btn-outline-danger w-100 py-3">
-             View Donors
+            🩸 View Donors
         </a>
-    </div>  
-    <div class="col-md-3">
-        <a href="{% url 'issues:issue_list' %}" class="btn btn-outline-danger w-100 py-3">
-    Issues
-</a>
     </div>
-
+    <div class="col-md-3">
+        <a href="{% url 'issues:issue_list' %}" 
+           class="btn btn-outline-danger w-100 py-3">
+            ⚠️ Issues
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'admin_panel:export_donneurs_csv' %}" 
+           class="btn btn-outline-success w-100 py-3">
+            📥 Export Donors CSV
+        </a>
+    </div>
+    <div class="col-md-3">
+    <a href="{% url 'admin_panel:campagnes_list' %}"
+       class="btn btn-outline-info w-100 py-3">
+        🏕️ View Campaigns
+    </a>
+</div>
 </div>
 
 <div class="row g-4">

@@ -141,6 +141,10 @@
                                    class="btn btn-sm btn-outline-primary">
                                     Details
                                 </a>
+<a href="{% url 'hospitals:modifier_campagne' campagne.id %}"
+   class="btn btn-sm btn-outline-primary">✏️ Edit</a>
+<a href="{% url 'hospitals:supprimer_campagne' campagne.id %}"
+   class="btn btn-sm btn-outline-danger">🗑️ Delete</a>
                             </div>
                         </div>
                     {% endfor %}

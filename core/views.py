@@ -1,13 +1,16 @@
+# core/views.py
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.views.decorators.http import require_POST
 
 from .forms import (
     DonneurRegistrationForm,
     HopitalRegistrationForm,
     LoginForm,
     EditDonneurForm,
+    EditHopitalForm,        
 )
 from .models import Donneur, Hopital
 
@@ -39,16 +42,11 @@ def register_hopital(request):
         if form.is_valid():
             hopital = form.save()
             login(request, hopital.user)
-            messages.warning(
-                request,
-                'Account created! Waiting for admin validation.'
-            )
+            messages.warning(request, 'Account created! Waiting for admin validation.')
             return redirect('hospitals:dashboard')
     else:
         form = HopitalRegistrationForm()
     return render(request, 'core/register_hopital.html', {'form': form})
-
-
 
 
 @login_required
@@ -69,11 +67,38 @@ def profile(request):
             'form':    form,
         })
     elif hasattr(user, 'hopital'):
+        hopital = user.hopital
+        if request.method == 'POST':
+            form = EditHopitalForm(request.POST, instance=hopital)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Profile updated!')
+                return redirect('core:profile')
+        else:
+            form = EditHopitalForm(instance=hopital)
         return render(request, 'core/profile_hopital.html', {
-            'hopital': user.hopital,
+            'hopital': hopital,
+            'form':    form,
         })
     else:
         return redirect('admin:index')
+
+
+@login_required
+@require_POST  
+def toggle_actif(request):
+    """Allow a donor to deactivate/reactivate their own account."""
+    if not hasattr(request.user, 'donneur'):
+        messages.error(request, 'Not a donor account.')
+        return redirect('core:home')
+    donneur       = request.user.donneur
+    donneur.actif = not donneur.actif
+    donneur.save()
+    status = 'activated' if donneur.actif else 'deactivated'
+    messages.success(request, f'Your account has been {status}.')
+    return redirect('core:profile')
+
+
 def user_login(request):
     if request.user.is_authenticated:
         return redirect('core:home')
@@ -101,8 +126,8 @@ def user_login(request):
     return render(request, 'core/login.html', {'form': form})
 
 
+@require_POST  # ✅ FIX: secure logout
 def user_logout(request):
     logout(request)
     messages.success(request, 'Logged out!')
     return redirect('core:home')
-

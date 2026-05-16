@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">✏️ Edit Campaign — {{ campagne.nom }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Campaign Name</label>
+                        {{ form.nom }}
+                        {% if form.nom.errors %}<div class="text-danger small">{{ form.nom.errors }}</div>{% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Date</label>
+                        {{ form.date }}
+                        {% if form.date.errors %}<div class="text-danger small">{{ form.date.errors }}</div>{% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Location</label>
+                        {{ form.lieu }}
+                        {% if form.lieu.errors %}<div class="text-danger small">{{ form.lieu.errors }}</div>{% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Total Capacity</label>
+                        {{ form.capacite_totale }}
+                        {% if form.capacite_totale.errors %}<div class="text-danger small">{{ form.capacite_totale.errors }}</div>{% endif %}
+                    </div>
+
+                    <!-- Blood type checkboxes — same grid layout as creer_campagne -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Targeted Blood Types</label>
+                        {% if form.groupes_cibles.errors %}
+                            <div class="text-danger small">{{ form.groupes_cibles.errors }}</div>
+                        {% endif %}
+                        <div class="row row-cols-2 row-cols-sm-4 g-2 mt-1">
+                            {% for checkbox in form.groupes_cibles %}
+                            <div class="col">
+                                <div class="form-check border rounded p-2 text-center h-100">
+                                    {{ checkbox.tag }}
+                                    <label class="form-check-label fw-bold text-danger"
+                                           for="{{ checkbox.id_for_label }}">
+                                        {{ checkbox.choice_label }}
+                                    </label>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <a href="{% url 'hospitals:detail_campagne' campagne.id %}"
+                           class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -3,55 +3,52 @@
 
 <div class="row justify-content-center">
     <div class="col-md-7">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"> Hospital Profile</h5>
+
+        <!-- Info Card -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">🏥 Hospital Profile</h5>
+                <span class="badge {% if hopital.valide %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                    {% if hopital.valide %}Validated{% else %}Pending Validation{% endif %}
+                </span>
             </div>
-            <div class="card-body p-4">
-                <table class="table table-borderless">
-                    <tr>
-                        <td><strong>Username:</strong></td>
-                        <td>{{ user.username }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Email:</strong></td>
-                        <td>{{ user.email }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Hospital:</strong></td>
-                        <td>{{ hopital.nom }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Address:</strong></td>
-                        <td>{{ hopital.adresse }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>City:</strong></td>
-                        <td>{{ hopital.ville }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>License:</strong></td>
-                        <td>{{ hopital.agrement }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Status:</strong></td>
-                        <td>
-                            {% if hopital.valide %}
-                                <span class="badge bg-success">Validated</span>
-                            {% else %}
-                                <span class="badge bg-warning text-dark">
-                                    Pending
-                                </span>
+            <div class="card-body">
+                <p><strong>Username:</strong> {{ hopital.user.username }}</p>
+                <p><strong>Email:</strong> {{ hopital.user.email }}</p>
+                <p><strong>Hospital Name:</strong> {{ hopital.nom }}</p>
+                <p><strong>Address:</strong> {{ hopital.adresse }}</p>
+                <p><strong>City:</strong> {{ hopital.ville }}</p>
+                <p><strong>License Number:</strong> {{ hopital.agrement }}</p>
+            </div>
+        </div>
+
+        <!-- ✅ Edit Form -->
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">✏️ Edit Profile</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger small">{{ field.errors }}</div>
                             {% endif %}
-                        </td>
-                    </tr>
-                </table>
-                <a href="{% url 'hospitals:dashboard' %}" class="btn btn-primary">
-                    Go to Dashboard
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                    
+                </form>
+                <a href="{% url 'donations:dashboard' %}"
+                   class="btn btn-outline-secondary w-100 mt-2">
+                    Cancel
                 </a>
             </div>
         </div>
+
     </div>
 </div>
-
 {% endblock %}

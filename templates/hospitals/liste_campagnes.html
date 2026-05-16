@@ -76,5 +76,8 @@
         <h4 class="text-muted">No campaigns available</h4>
     </div>
 {% endif %}
-
+<a href="{% url 'donations:dashboard' %}"
+                   class="btn btn-outline-secondary w-100 mt-2">
+                    Cancel
+                </a>
 {% endblock %}

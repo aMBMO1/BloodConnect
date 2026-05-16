@@ -27,4 +27,5 @@ urlpatterns = [
     path('profile/',
          views.profile,
          name='profile'),
+         path('profile/toggle-actif/', views.toggle_actif, name='toggle_actif'),
 ]
