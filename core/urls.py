@@ -8,15 +8,15 @@ urlpatterns = [
          views.home,
          name='home'),
 
-    path('register/donneur/',
-         views.register_donneur,
-         name='register_donneur'),
+    path('register/donor/',
+         views.register_donor,
+         name='register_donor'),
 
-    path('register/hopital/',
-         views.register_hopital,
-         name='register_hopital'),
+    path('register/hospital/',
+         views.register_hospital,
+         name='register_hospital'),
 
-       path('login/',
+    path('login/',
          views.user_login,
          name='login'),
 
@@ -27,5 +27,7 @@ urlpatterns = [
     path('profile/',
          views.profile,
          name='profile'),
-         path('profile/toggle-actif/', views.toggle_actif, name='toggle_actif'),
+    path('profile/toggle-active/',
+         views.toggle_active,
+         name='toggle_active'),
 ]

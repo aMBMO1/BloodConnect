@@ -15,4 +15,4 @@ class IssueCreateView(CreateView):
     model = Issue
     fields = ['title', 'description', 'user_email']
     template_name = 'issues/report_issue.html'
-    success_url = reverse_lazy('issue_thanks')
+    success_url = reverse_lazy('issues:issue_thanks')

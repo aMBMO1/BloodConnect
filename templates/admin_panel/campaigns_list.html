@@ -2,11 +2,11 @@
 {% block content %}
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="fw-bold">🏕️ All Campaigns</h3>
+    <h3 class="fw-bold">All Campaigns</h3>
     <a href="{% url 'admin_panel:dashboard' %}" class="btn btn-outline-secondary">← Back</a>
 </div>
 
-{% if campagnes %}
+{% if campaigns %}
 <div class="table-responsive">
     <table class="table table-hover align-middle">
         <thead class="table-dark">
@@ -22,22 +22,22 @@
             </tr>
         </thead>
         <tbody>
-            {% for c in campagnes %}
+            {% for c in campaigns %}
             <tr>
                 <td>{{ forloop.counter }}</td>
-                <td>{{ c.nom }}</td>
-                <td>{{ c.hopital.nom }}</td>
+                <td>{{ c.name }}</td>
+                <td>{{ c.hospital.name }}</td>
                 <td>{{ c.date }}</td>
-                <td>{{ c.lieu }}</td>
+                <td>{{ c.location }}</td>
                 <td>
-                    {% for g in c.groupes_cibles %}
+                    {% for g in c.target_groups %}
                         <span class="badge bg-danger">{{ g }}</span>
                     {% endfor %}
                 </td>
-                <td>{{ c.capacite_totale }}</td>
+                <td>{{ c.total_capacity }}</td>
                 <td>
-                    <span class="badge {% if c.total_inscriptions >= c.capacite_totale %}bg-danger{% else %}bg-success{% endif %}">
-                        {{ c.total_inscriptions }} / {{ c.capacite_totale }}
+                    <span class="badge {% if c.total_registrations >= c.total_capacity %}bg-danger{% else %}bg-success{% endif %}">
+                        {{ c.total_registrations }} / {{ c.total_capacity }}
                     </span>
                 </td>
             </tr>

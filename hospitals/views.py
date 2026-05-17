@@ -5,249 +5,249 @@ from django.contrib import messages
 from django.db import transaction
 from django.db.models import Count
 
-from .models import Campagne, Inscription
-from .forms  import DemandeUrgenteForm, CampagneForm, InscriptionCampagneForm
-from donations.models import DemandeUrgente, ReponseAppel
-from core.models import Hopital, Donneur
+from .models import Campaign, Registration
+from .forms  import UrgentRequestForm, CampaignForm, RegistrationCampaignForm
+from donations.models import UrgentRequest, AppealResponse
+from core.models import Hospital, Donor
 from donations.utils import get_compatible_blood_types
 
 
-def get_hopital_or_redirect(request):
-    if not hasattr(request.user, 'hopital'):
+def get_hospital_or_redirect(request):
+    if not hasattr(request.user, 'hospital'):
         messages.error(request, 'You must be a hospital.')
         return None, redirect('core:home')
-    return request.user.hopital, None
+    return request.user.hospital, None
 
 
 @login_required
 def dashboard(request):
-    hopital, redir = get_hopital_or_redirect(request)
+    hospital, redir = get_hospital_or_redirect(request)
     if redir:
         return redir
-    if not hopital.valide:
+    if not hospital.validated:
         messages.warning(request, 'Pending admin validation.')
-    demandes         = DemandeUrgente.objects.filter(hopital=hopital).order_by('-created_at')
-    campagnes        = Campagne.objects.filter(hopital=hopital).order_by('-date')
-    demandes_actives = demandes.filter(statut='active').count()
-    total_reponses   = ReponseAppel.objects.filter(demande__hopital=hopital).count()
+    requests         = UrgentRequest.objects.filter(hospital=hospital).order_by('-created_at')
+    campaigns        = Campaign.objects.filter(hospital=hospital).order_by('-date')
+    active_requests = requests.filter(status='active').count()
+    total_responses  = AppealResponse.objects.filter(request__hospital=hospital).count()
     return render(request, 'hospitals/dashboard.html', {
-        'hopital':          hopital,
-        'demandes':         demandes,
-        'campagnes':        campagnes,
-        'demandes_actives': demandes_actives,
-        'total_reponses':   total_reponses,
+        'hospital':        hospital,
+        'requests':        requests,
+        'campaigns':       campaigns,
+        'active_requests': active_requests,
+        'total_responses': total_responses,
     })
 
 
 @login_required
-def creer_demande(request):
-    hopital, redir = get_hopital_or_redirect(request)
+def create_request(request):
+    hospital, redir = get_hospital_or_redirect(request)
     if redir:
         return redir
-    if not hopital.valide:
+    if not hospital.validated:
         messages.error(request, 'Hospital must be validated first.')
         return redirect('hospitals:dashboard')
     if request.method == 'POST':
-        form = DemandeUrgenteForm(request.POST)
+        form = UrgentRequestForm(request.POST)
         if form.is_valid():
-            demande         = form.save(commit=False)
-            demande.hopital = hopital
-            demande.save()
+            urgent_request    = form.save(commit=False)
+            urgent_request.hospital = hospital
+            urgent_request.save()
             messages.success(request, 'Request created!')
             return redirect('hospitals:dashboard')
     else:
-        form = DemandeUrgenteForm()
-    return render(request, 'hospitals/creer_demande.html', {
-        'form': form, 'hopital': hopital
+        form = UrgentRequestForm()
+    return render(request, 'hospitals/create_request.html', {
+        'form': form, 'hospital': hospital
     })
 
 
 @login_required
-def modifier_demande(request, demande_id):
-    hopital, redir = get_hopital_or_redirect(request)
+def modify_request(request, request_id):
+    hospital, redir = get_hospital_or_redirect(request)
     if redir:
         return redir
-    demande = get_object_or_404(DemandeUrgente, id=demande_id, hopital=hopital)
+    urgent_request = get_object_or_404(UrgentRequest, id=request_id, hospital=hospital)
     if request.method == 'POST':
-        form = DemandeUrgenteForm(request.POST, instance=demande)
+        form = UrgentRequestForm(request.POST, instance=urgent_request)
         if form.is_valid():
             form.save()
             messages.success(request, 'Request updated!')
-            return redirect('hospitals:voir_demande', demande_id=demande.id)
+            return redirect('hospitals:view_request', request_id=urgent_request.id)
     else:
-        form = DemandeUrgenteForm(instance=demande)
-    return render(request, 'hospitals/modifier_demande.html', {
-        'form': form, 'demande': demande
+        form = UrgentRequestForm(instance=urgent_request)
+    return render(request, 'hospitals/modify_request.html', {
+        'form': form, 'request': urgent_request
     })
 
 
 @login_required
-def voir_demande(request, demande_id):
-    hopital, redir = get_hopital_or_redirect(request)
+def view_request(request, request_id):
+    hospital, redir = get_hospital_or_redirect(request)
     if redir:
         return redir
-    demande  = get_object_or_404(DemandeUrgente, id=demande_id, hopital=hopital)
-    reponses = ReponseAppel.objects.filter(
-        demande=demande
-    ).select_related('donneur__user').order_by('-date_reponse')
-    return render(request, 'hospitals/voir_demande.html', {
-        'demande': demande, 'reponses': reponses
+    urgent_request = get_object_or_404(UrgentRequest, id=request_id, hospital=hospital)
+    responses = AppealResponse.objects.filter(
+        request=urgent_request
+    ).select_related('donor__user').order_by('-response_date')
+    return render(request, 'hospitals/view_request.html', {
+        'request': urgent_request, 'responses': responses
     })
 
 
 @login_required
-def cloturer_demande(request, demande_id):
-    hopital, redir = get_hopital_or_redirect(request)
+def close_request(request, request_id):
+    hospital, redir = get_hospital_or_redirect(request)
     if redir:
         return redir
-    demande        = get_object_or_404(DemandeUrgente, id=demande_id, hopital=hopital)
-    demande.statut = 'closed'
-    demande.save()
+    urgent_request     = get_object_or_404(UrgentRequest, id=request_id, hospital=hospital)
+    urgent_request.status = 'closed'
+    urgent_request.save()
     messages.success(request, 'Request closed.')
     return redirect('hospitals:dashboard')
 
 
 @login_required
-def creer_campagne(request):
-    hopital, redir = get_hopital_or_redirect(request)
+def create_campaign(request):
+    hospital, redir = get_hospital_or_redirect(request)
     if redir:
         return redir
-    if not hopital.valide:
+    if not hospital.validated:
         messages.error(request, 'Hospital must be validated first.')
         return redirect('hospitals:dashboard')
     if request.method == 'POST':
-        form = CampagneForm(request.POST)
+        form = CampaignForm(request.POST)
         if form.is_valid():
-            campagne         = form.save(commit=False)
-            campagne.hopital = hopital
-            campagne.save()
+            campaign        = form.save(commit=False)
+            campaign.hospital = hospital
+            campaign.save()
             messages.success(request, 'Campaign created!')
             return redirect('hospitals:dashboard')
     else:
-        form = CampagneForm()
-    return render(request, 'hospitals/creer_campagne.html', {
-        'form': form, 'hopital': hopital
+        form = CampaignForm()
+    return render(request, 'hospitals/create_campaign.html', {
+        'form': form, 'hospital': hospital
     })
 
 
 @login_required
-def detail_campagne(request, campagne_id):
-    hopital, redir = get_hopital_or_redirect(request)
+def campaign_detail(request, campaign_id):
+    hospital, redir = get_hospital_or_redirect(request)
     if redir:
         return redir
-    campagne     = get_object_or_404(Campagne, id=campagne_id, hopital=hopital)
-    inscriptions = Inscription.objects.filter(
-        campagne=campagne
-    ).select_related('donneur__user').order_by('creneau_horaire')
-    return render(request, 'hospitals/detail_campagne.html', {
-        'campagne': campagne, 'inscriptions': inscriptions
+    campaign     = get_object_or_404(Campaign, id=campaign_id, hospital=hospital)
+    registrations = Registration.objects.filter(
+        campaign=campaign
+    ).select_related('donor__user').order_by('time_slot')
+    return render(request, 'hospitals/campaign_detail.html', {
+        'campaign': campaign, 'registrations': registrations
     })
 
 
 @login_required
-def inscrire_campagne(request, campagne_id):
-    if not hasattr(request.user, 'donneur'):
+def register_campaign(request, campaign_id):
+    if not hasattr(request.user, 'donor'):
         messages.error(request, 'You must be a donor.')
         return redirect('core:home')
-    donneur  = request.user.donneur
-    campagne = get_object_or_404(Campagne, id=campagne_id)
+    donor    = request.user.donor
+    campaign = get_object_or_404(Campaign, id=campaign_id)
 
     # ✅ check blood type on BOTH GET and POST
-    if donneur.groupe_sanguin not in campagne.groupes_cibles:
+    if donor.blood_type not in campaign.target_groups:
         messages.error(request, 'Your blood type is not targeted by this campaign.')
-        return redirect('hospitals:liste_campagnes')
+        return redirect('hospitals:campaign_list')
 
-    if Inscription.objects.filter(campagne=campagne, donneur=donneur).exists():
+    if Registration.objects.filter(campaign=campaign, donor=donor).exists():
         messages.warning(request, 'Already registered!')
-        return redirect('hospitals:liste_campagnes')
+        return redirect('hospitals:campaign_list')
 
     if request.method == 'POST':
-        form = InscriptionCampagneForm(request.POST)
+        form = RegistrationCampaignForm(request.POST)
         if form.is_valid():
             with transaction.atomic():
-                campagne_locked = Campagne.objects.select_for_update().get(id=campagne_id)
-                if campagne_locked.est_pleine():
+                campaign_locked = Campaign.objects.select_for_update().get(id=campaign_id)
+                if campaign_locked.is_full():
                     messages.error(request, 'Campaign is full!')
-                    return redirect('hospitals:liste_campagnes')
-                inscription          = form.save(commit=False)
-                inscription.campagne = campagne_locked
-                inscription.donneur  = donneur
-                inscription.save()
-            messages.success(request, f'Registered for {campagne.nom}!')
+                    return redirect('hospitals:campaign_list')
+                registration       = form.save(commit=False)
+                registration.campaign = campaign_locked
+                registration.donor   = donor
+                registration.save()
+            messages.success(request, f'Registered for {campaign.name}!')
             return redirect('donations:dashboard')
     else:
-        if campagne.est_pleine():
+        if campaign.is_full():
             messages.error(request, 'Campaign is full!')
-            return redirect('hospitals:liste_campagnes')
-        form = InscriptionCampagneForm()
+            return redirect('hospitals:campaign_list')
+        form = RegistrationCampaignForm()
 
-    return render(request, 'hospitals/inscrire_campagne.html', {
-        'form': form, 'campagne': campagne, 'donneur': donneur
+    return render(request, 'hospitals/register_campaign.html', {
+        'form': form, 'campaign': campaign, 'donor': donor
     })
 
 @login_required
-def liste_campagnes(request):
-    campagnes_raw = Campagne.objects.annotate(
-        filled=Count('inscriptions')
+def campaign_list(request):
+    campaigns_raw = Campaign.objects.annotate(
+        filled=Count('registrations')
     ).order_by('date')
 
-    donneur = getattr(request.user, 'donneur', None)
+    donor = getattr(request.user, 'donor', None)
 
-    campagnes = []
-    for campagne in campagnes_raw:
-        total   = campagne.capacite_totale
-        filled  = campagne.filled
+    campaigns = []
+    for campaign in campaigns_raw:
+        total   = campaign.total_capacity
+        filled  = campaign.filled
         percent = int((filled / total) * 100) if total > 0 else 0
 
         # ✅ FIX: campaign is compatible if it's asking for THIS donor's blood type
         # Not whether the donor can donate to others
         compatible = (
-            donneur.groupe_sanguin in campagne.groupes_cibles
-            if donneur else True
+            donor.blood_type in campaign.target_groups
+            if donor else True
         )
 
-        campagnes.append({
-            'obj':        campagne,
+        campaigns.append({
+            'obj':        campaign,
             'filled':     filled,
             'total':      total,
             'percent':    percent,
-            'restantes':  total - filled,
-            'est_pleine': filled >= total,
+            'remaining':  total - filled,
+            'is_full': filled >= total,
             'compatible': compatible,
         })
 
-    return render(request, 'hospitals/liste_campagnes.html', {'campagnes': campagnes})
+    return render(request, 'hospitals/campaign_list.html', {'campaigns': campaigns})
 @login_required
-def modifier_campagne(request, campagne_id):
-    hopital, redir = get_hopital_or_redirect(request)
+def modify_campaign(request, campaign_id):
+    hospital, redir = get_hospital_or_redirect(request)
     if redir:
         return redir
-    campagne = get_object_or_404(Campagne, id=campagne_id, hopital=hopital)
+    campaign = get_object_or_404(Campaign, id=campaign_id, hospital=hospital)
     if request.method == 'POST':
-        form = CampagneForm(request.POST, instance=campagne)
+        form = CampaignForm(request.POST, instance=campaign)
         if form.is_valid():
             form.save()
             messages.success(request, 'Campaign updated!')
-            return redirect('hospitals:detail_campagne', campagne_id=campagne.id)
+            return redirect('hospitals:campaign_detail', campaign_id=campaign.id)
     else:
         # ✅ pre-check the existing blood types in the checkboxes
-        form = CampagneForm(
-            instance=campagne,
-            initial={'groupes_cibles': campagne.groupes_cibles}
+        form = CampaignForm(
+            instance=campaign,
+            initial={'target_groups': campaign.target_groups}
         )
-    return render(request, 'hospitals/modifier_campagne.html', {
-        'form': form, 'campagne': campagne
+    return render(request, 'hospitals/modify_campaign.html', {
+        'form': form, 'campaign': campaign
     })
 
 
 @login_required
-def supprimer_campagne(request, campagne_id):
-    hopital, redir = get_hopital_or_redirect(request)
+def delete_campaign(request, campaign_id):
+    hospital, redir = get_hospital_or_redirect(request)
     if redir:
         return redir
-    campagne = get_object_or_404(Campagne, id=campagne_id, hopital=hopital)
+    campaign = get_object_or_404(Campaign, id=campaign_id, hospital=hospital)
     if request.method == 'POST':
-        campagne.delete()
-        messages.success(request, f'Campaign "{campagne.nom}" deleted.')
+        campaign.delete()
+        messages.success(request, f'Campaign "{campaign.name}" deleted.')
         return redirect('hospitals:dashboard')
-    return render(request, 'hospitals/supprimer_campagne.html', {'campagne': campagne})
+    return render(request, 'hospitals/delete_campaign.html', {'campaign': campaign})

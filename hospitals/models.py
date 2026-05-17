@@ -1,45 +1,44 @@
 # hospitals/models.py
 from django.db import models
-from core.models import Hopital, Donneur
+from core.models import Hospital, Donor
 from core.constants import BLOOD_TYPES, BLOOD_TYPE_VALUES
 
 
-class Campagne(models.Model):
-    hopital         = models.ForeignKey(Hopital, on_delete=models.CASCADE, related_name='campagnes')
-    nom             = models.CharField(max_length=200)
+class Campaign(models.Model):
+    hospital        = models.ForeignKey(Hospital, on_delete=models.CASCADE, related_name='campaigns')
+    name            = models.CharField(max_length=200)
     date            = models.DateField()
-    lieu            = models.CharField(max_length=200)
-    # Stored as a JSON list, e.g. ["A+", "O-"]
-    groupes_cibles  = models.JSONField(default=list)
-    capacite_totale = models.PositiveIntegerField()
+    location        = models.CharField(max_length=200)
+    target_groups   = models.JSONField(default=list)
+    total_capacity  = models.PositiveIntegerField()
     created_at      = models.DateTimeField(auto_now_add=True)
 
-    def places_restantes(self):
-        return self.capacite_totale - self.inscriptions.count()
+    def remaining_spots(self):
+        return self.total_capacity - self.registrations.count()
 
-    def est_pleine(self):
-        return self.inscriptions.count() >= self.capacite_totale
+    def is_full(self):
+        return self.registrations.count() >= self.total_capacity
 
     def __str__(self):
-        return self.nom
+        return self.name
 
     class Meta:
-        verbose_name        = "Campagne"
-        verbose_name_plural = "Campagnes"
+        verbose_name        = "Campaign"
+        verbose_name_plural = "Campaigns"
         ordering            = ['-date']
 
 
-class Inscription(models.Model):
-    campagne         = models.ForeignKey(Campagne, on_delete=models.CASCADE, related_name='inscriptions')
-    donneur          = models.ForeignKey(Donneur, on_delete=models.CASCADE, related_name='inscriptions')
-    creneau_horaire  = models.TimeField()
-    date_inscription = models.DateTimeField(auto_now_add=True)
-    present          = models.BooleanField(default=False)
+class Registration(models.Model):
+    campaign          = models.ForeignKey(Campaign, on_delete=models.CASCADE, related_name='registrations')
+    donor             = models.ForeignKey(Donor, on_delete=models.CASCADE, related_name='registrations')
+    time_slot         = models.TimeField()
+    registration_date = models.DateTimeField(auto_now_add=True)
+    present           = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.donneur.user.username} - {self.campagne.nom}"
+        return f"{self.donor.user.username} - {self.campaign.name}"
 
     class Meta:
-        verbose_name        = "Inscription"
-        verbose_name_plural = "Inscriptions"
-        unique_together     = ('campagne', 'donneur')
+        verbose_name        = "Registration"
+        verbose_name_plural = "Registrations"
+        unique_together     = ('campaign', 'donor')

@@ -1,16 +1,16 @@
 from django.contrib import admin
-from .models import Campagne, Inscription
+from .models import Campaign, Registration
 
 
-@admin.register(Campagne)
-class CampagneAdmin(admin.ModelAdmin):
-    list_display  = ['nom', 'hopital', 'date', 'lieu', 'capacite_totale']
+@admin.register(Campaign)
+class CampaignAdmin(admin.ModelAdmin):
+    list_display  = ['name', 'hospital', 'date', 'location', 'total_capacity']
     list_filter   = ['date']
-    search_fields = ['nom', 'hopital__nom']
+    search_fields = ['name', 'hospital__name']
 
 
-@admin.register(Inscription)
-class InscriptionAdmin(admin.ModelAdmin):
-    list_display  = ['donneur', 'campagne', 'creneau_horaire', 'present']
+@admin.register(Registration)
+class RegistrationAdmin(admin.ModelAdmin):
+    list_display  = ['donor', 'campaign', 'time_slot', 'present']
     list_filter   = ['present']
-    search_fields = ['donneur__user__username']
+    search_fields = ['donor__user__username']

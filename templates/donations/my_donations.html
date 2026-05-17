@@ -2,11 +2,11 @@
 {% block content %}
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="fw-bold mb-0">My Donations ({{ total_dons }})</h3>
-    <a href="{% url 'donations:enregistrer_don' %}" class="btn btn-danger">+ Record New</a>
+    <h3 class="fw-bold mb-0">My Donations ({{ total_donations }})</h3>
+    <a href="{% url 'donations:register_donation' %}" class="btn btn-danger">+ Record New</a>
 </div>
 
-{% if dons %}
+{% if donations %}
 <div class="table-responsive">
     <table class="table table-hover align-middle">
         <thead class="table-danger">
@@ -20,23 +20,23 @@
             </tr>
         </thead>
         <tbody>
-            {% for don in dons %}
+            {% for donation in donations %}
             <tr>
                 <td>{{ forloop.counter }}</td>
-                <td>{{ don.hopital.nom }}</td>
-                <td>{{ don.date_don|date:"F j, Y" }}</td>
-                <td>{{ don.notes|default:"—" }}</td>
+                <td>{{ donation.hospital.name }}</td>
+                <td>{{ donation.donation_date|date:"F j, Y" }}</td>
+                <td>{{ donation.notes|default:"—" }}</td>
                 <td>
-                    {% if don.valide %}
+                    {% if donation.validated %}
                         <span class="badge bg-success">Validated</span>
                     {% else %}
                         <span class="badge bg-secondary">Pending</span>
                     {% endif %}
                 </td>
                 <td>
-                    <a href="{% url 'donations:modifier_don' don.id %}"
+                    <a href="{% url 'donations:modify_donation' donation.id %}"
                        class="btn btn-sm btn-outline-primary">✏️ Edit</a>
-                    <a href="{% url 'donations:supprimer_don' don.id %}"
+                    <a href="{% url 'donations:delete_donation' donation.id %}"
                        class="btn btn-sm btn-outline-danger">🗑️ Delete</a>
                 </td>
             </tr>
@@ -47,8 +47,7 @@
 {% else %}
 <div class="alert alert-info">No donations recorded yet.</div>
 {% endif %}
-<a href="{% url 'donations:dashboard' %}"
-                   class="btn btn-outline-secondary w-100 mt-2">
-                    Cancel
-                </a>
+
+<a href="{% url 'donations:dashboard' %}" class="btn btn-outline-secondary mt-2">← Back to Dashboard</a>
+
 {% endblock %}

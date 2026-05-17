@@ -1,10 +1,10 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Donneur, Hopital
+from .models import Donor, Hospital
 from .constants import BLOOD_TYPES 
 
 
-class DonneurRegistrationForm(forms.Form):
+class DonorRegistrationForm(forms.Form):
 
     username = forms.CharField(
         max_length=150,
@@ -21,21 +21,21 @@ class DonneurRegistrationForm(forms.Form):
         label='Confirm Password',
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm Password'})
     )
-    groupe_sanguin = forms.ChoiceField(
+    blood_type = forms.ChoiceField(
         label='Blood Type',
         choices=BLOOD_TYPES,  
         widget=forms.Select(attrs={'class': 'form-select'})
     )
-    sexe = forms.ChoiceField(
+    gender = forms.ChoiceField(
         label='Gender',
-        choices=Donneur.GENDER_CHOICES,
+        choices=Donor.GENDER_CHOICES,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
-    date_naissance = forms.DateField(
+    date_of_birth = forms.DateField(
         label='Date of Birth',
         widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
     )
-    ville = forms.CharField(
+    city = forms.CharField(
         label='City',
         max_length=100,
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'City'})
@@ -67,17 +67,17 @@ class DonneurRegistrationForm(forms.Form):
             email=self.cleaned_data['email'],
             password=self.cleaned_data['password'],
         )
-        donneur = Donneur.objects.create(
+        donor = Donor.objects.create(
             user=user,
-            groupe_sanguin=self.cleaned_data['groupe_sanguin'],
-            sexe=self.cleaned_data['sexe'],
-            date_naissance=self.cleaned_data['date_naissance'],
-            ville=self.cleaned_data['ville'],
+            blood_type=self.cleaned_data['blood_type'],
+            gender=self.cleaned_data['gender'],
+            date_of_birth=self.cleaned_data['date_of_birth'],
+            city=self.cleaned_data['city'],
         )
-        return donneur
+        return donor
 
 
-class HopitalRegistrationForm(forms.Form):
+class HospitalRegistrationForm(forms.Form):
 
     username = forms.CharField(
         max_length=150,
@@ -94,21 +94,21 @@ class HopitalRegistrationForm(forms.Form):
         label='Confirm Password',
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm Password'})
     )
-    nom = forms.CharField(
+    name = forms.CharField(
         label='Hospital Name',
         max_length=200,
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Hospital Name'})
     )
-    adresse = forms.CharField(
+    address = forms.CharField(
         label='Address',
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Full Address'})
     )
-    ville = forms.CharField(
+    city = forms.CharField(
         label='City',
         max_length=100,
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'City'})
     )
-    agrement = forms.CharField(
+    approval = forms.CharField(
         label='License Number',
         max_length=100,
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'License Number'})
@@ -126,11 +126,11 @@ class HopitalRegistrationForm(forms.Form):
             raise forms.ValidationError('Email already registered!')
         return email
 
-    def clean_agrement(self):
-        agrement = self.cleaned_data.get('agrement')
-        if Hopital.objects.filter(agrement=agrement).exists():
+    def clean_approval(self):
+        approval = self.cleaned_data.get('approval')
+        if Hospital.objects.filter(approval=approval).exists():
             raise forms.ValidationError('License number already registered!')
-        return agrement
+        return approval
 
     def clean(self):
         cleaned_data = super().clean()
@@ -146,52 +146,52 @@ class HopitalRegistrationForm(forms.Form):
             email=self.cleaned_data['email'],
             password=self.cleaned_data['password'],
         )
-        hopital = Hopital.objects.create(
+        hospital = Hospital.objects.create(
             user=user,
-            nom=self.cleaned_data['nom'],
-            adresse=self.cleaned_data['adresse'],
-            ville=self.cleaned_data['ville'],
-            agrement=self.cleaned_data['agrement'],
+            name=self.cleaned_data['name'],
+            address=self.cleaned_data['address'],
+            city=self.cleaned_data['city'],
+            approval=self.cleaned_data['approval'],
         )
-        return hopital
+        return hospital
 
 
-class EditDonneurForm(forms.ModelForm):
-    """Edit donor profile — actif is intentionally excluded here,
-    it's toggled separately via the toggle_actif view."""
-
-    class Meta:
-        model  = Donneur
-        fields = ['groupe_sanguin', 'sexe', 'date_naissance', 'ville']  # ✅ actif removed
-        widgets = {
-            'groupe_sanguin': forms.Select(attrs={'class': 'form-select'}),
-            'sexe':           forms.Select(attrs={'class': 'form-select'}),
-            'date_naissance': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'ville':          forms.TextInput(attrs={'class': 'form-control'}),
-        }
-        labels = {
-            'groupe_sanguin': 'Blood Type',
-            'sexe':           'Gender',
-            'date_naissance': 'Date of Birth',
-            'ville':          'City',
-        }
-
-
-class EditHopitalForm(forms.ModelForm):
-    """Edit hospital profile — agrement excluded, shouldn't change after registration."""
+class EditDonorForm(forms.ModelForm):
+    """Edit donor profile — active is intentionally excluded here,
+    it's toggled separately via the toggle_active view."""
 
     class Meta:
-        model  = Hopital
-        fields = ['nom', 'adresse', 'ville']  # ✅ agrement intentionally excluded
+        model  = Donor
+        fields = ['blood_type', 'gender', 'date_of_birth', 'city']  # ✅ active removed
         widgets = {
-            'nom':     forms.TextInput(attrs={'class': 'form-control'}),
-            'adresse': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'ville':   forms.TextInput(attrs={'class': 'form-control'}),
+            'blood_type': forms.Select(attrs={'class': 'form-select'}),
+            'gender':     forms.Select(attrs={'class': 'form-select'}),
+            'date_of_birth': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'city':       forms.TextInput(attrs={'class': 'form-control'}),
         }
         labels = {
-            'nom':     'Hospital Name',
-            'adresse': 'Address',
-            'ville':   'City',
+            'blood_type': 'Blood Type',
+            'gender':     'Gender',
+            'date_of_birth': 'Date of Birth',
+            'city':       'City',
+        }
+
+
+class EditHospitalForm(forms.ModelForm):
+    """Edit hospital profile — approval excluded, shouldn't change after registration."""
+
+    class Meta:
+        model  = Hospital
+        fields = ['name', 'address', 'city']  # ✅ approval intentionally excluded
+        widgets = {
+            'name':    forms.TextInput(attrs={'class': 'form-control'}),
+            'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'city':    forms.TextInput(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            'name':    'Hospital Name',
+            'address': 'Address',
+            'city':    'City',
         }
 
 

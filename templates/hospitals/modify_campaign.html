@@ -5,7 +5,7 @@
     <div class="col-md-7">
         <div class="card shadow">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">✏️ Edit Campaign — {{ campagne.nom }}</h5>
+                <h5 class="mb-0">✏️ Edit Campaign — {{ campaign.name }}</h5>
             </div>
             <div class="card-body">
                 <form method="post">
@@ -13,8 +13,8 @@
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Campaign Name</label>
-                        {{ form.nom }}
-                        {% if form.nom.errors %}<div class="text-danger small">{{ form.nom.errors }}</div>{% endif %}
+                        {{ form.name }}
+                        {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors }}</div>{% endif %}
                     </div>
 
                     <div class="mb-3">
@@ -25,24 +25,23 @@
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Location</label>
-                        {{ form.lieu }}
-                        {% if form.lieu.errors %}<div class="text-danger small">{{ form.lieu.errors }}</div>{% endif %}
+                        {{ form.location }}
+                        {% if form.location.errors %}<div class="text-danger small">{{ form.location.errors }}</div>{% endif %}
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Total Capacity</label>
-                        {{ form.capacite_totale }}
-                        {% if form.capacite_totale.errors %}<div class="text-danger small">{{ form.capacite_totale.errors }}</div>{% endif %}
+                        {{ form.total_capacity }}
+                        {% if form.total_capacity.errors %}<div class="text-danger small">{{ form.total_capacity.errors }}</div>{% endif %}
                     </div>
 
-                    <!-- Blood type checkboxes — same grid layout as creer_campagne -->
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Targeted Blood Types</label>
-                        {% if form.groupes_cibles.errors %}
-                            <div class="text-danger small">{{ form.groupes_cibles.errors }}</div>
+                        {% if form.target_groups.errors %}
+                            <div class="text-danger small">{{ form.target_groups.errors }}</div>
                         {% endif %}
                         <div class="row row-cols-2 row-cols-sm-4 g-2 mt-1">
-                            {% for checkbox in form.groupes_cibles %}
+                            {% for checkbox in form.target_groups %}
                             <div class="col">
                                 <div class="form-check border rounded p-2 text-center h-100">
                                     {{ checkbox.tag }}
@@ -58,7 +57,7 @@
 
                     <div class="d-flex gap-2 mt-4">
                         <button type="submit" class="btn btn-primary">Save Changes</button>
-                        <a href="{% url 'hospitals:detail_campagne' campagne.id %}"
+                        <a href="{% url 'hospitals:campaign_detail' campaign.id %}"
                            class="btn btn-outline-secondary">Cancel</a>
                     </div>
                 </form>

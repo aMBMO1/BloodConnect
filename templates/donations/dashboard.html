@@ -1,69 +1,56 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h3 class="fw-bold mb-4">
-     Dashboard —
-    <span class="badge bg-danger">{{ donneur.groupe_sanguin }}</span>
-</h3>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold mb-0">Dashboard — <span class="badge bg-danger">{{ donor.blood_type }}</span></h3>
+</div>
 
 <div class="row g-3 mb-4">
     <div class="col-md-3">
         <div class="card shadow text-center border-danger">
             <div class="card-body">
-                <h2 class="text-danger fw-bold">{{ total_dons }}</h2>
-                <p class="text-muted mb-0">Total Donations</p>
+                <h2 class="text-danger fw-bold">{{ total_donations }}</h2>
+                <p class="text-muted mb-0 small">Total Donations</p>
             </div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="card shadow text-center border-warning">
             <div class="card-body">
-                <h2 class="text-warning fw-bold">{{ demandes.count }}</h2>
-                <p class="text-muted mb-0">Urgent Calls</p>
+                <h2 class="text-warning fw-bold">{{ requests.count }}</h2>
+                <p class="text-muted mb-0 small">Urgent Calls</p>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card shadow text-center
-             {% if is_eligible %}border-success{% else %}border-secondary{% endif %}">
+        <div class="card shadow text-center {% if is_eligible %}border-success{% else %}border-danger{% endif %}">
             <div class="card-body">
                 {% if is_eligible %}
                     <h2 class="text-success fw-bold">✓</h2>
-                    <p class="text-muted mb-0">Eligible</p>
+                    <p class="text-muted mb-0 small">Eligible</p>
                 {% else %}
-                    <h2 class="text-secondary fw-bold">✗</h2>
-                    <p class="text-muted mb-0">Not Eligible</p>
+                    <h2 class="text-danger fw-bold">✗</h2>
+                    <p class="text-muted mb-0 small">Not Eligible</p>
                 {% endif %}
             </div>
         </div>
     </div>
     <div class="col-md-3">
-    <div class="card shadow text-center border-info">
-        <div class="card-body">
-            <h2 class="text-info fw-bold">{{ inscriptions|length }}</h2>
-            <p class="text-muted mb-2 small">Campaigns</p>
-            <a href="{% url 'hospitals:liste_campagnes' %}" class="btn btn-outline-info btn-sm">
-                View All
-            </a>
+        <div class="card shadow text-center border-info">
+            <div class="card-body">
+                <h2 class="text-info fw-bold">{{ registrations|length }}</h2>
+                <p class="text-muted mb-2 small">Campaigns</p>
+                <a href="{% url 'hospitals:campaign_list' %}" class="btn btn-outline-info btn-sm">View All</a>
+            </div>
         </div>
     </div>
 </div>
-</div>
 
 {% if not is_eligible %}
-    <div class="alert alert-warning">
-        <i class="bi bi-clock"></i>
-        Next eligible date: <strong>{{ next_date }}</strong>
-    </div>
-{% else %}
-    <div class="alert alert-success">
-        <i class="bi bi-check-circle"></i>
-        You are eligible to donate!
-        <a href="{% url 'donations:enregistrer_don' %}"
-           class="btn btn-success btn-sm ms-3">
-            Record Donation
-        </a>
-    </div>
+<div class="alert alert-warning">
+    <i class="bi bi-clock me-2"></i>
+    Next eligible date: <strong>{{ next_date }}</strong>
+</div>
 {% endif %}
 
 <div class="row g-4">
@@ -74,33 +61,21 @@
                 <h5 class="mb-0">Urgent Calls for You</h5>
             </div>
             <div class="card-body">
-                {% if demandes %}
-                    {% for demande in demandes|slice:":3" %}
-                        <div class="d-flex justify-content-between
-                                    align-items-center border-bottom py-2">
+                {% if requests %}
+                    {% for request in requests|slice:":3" %}
+                        <div class="d-flex justify-content-between align-items-center border-bottom py-2">
                             <div>
-                                <span class="badge bg-danger me-2">
-                                    {{ demande.groupe_sanguin }}
-                                </span>
-                                {{ demande.hopital.nom }}
-                                <small class="text-muted d-block">
-                                    Deadline: {{ demande.delai }}
-                                </small>
+                                <span class="badge bg-danger me-2">{{ request.blood_type }}</span>
+                                {{ request.hospital.name }}
+                                <small class="text-muted d-block">Deadline: {{ request.deadline }}</small>
                             </div>
-                            <a href="{% url 'donations:repondre_appel' demande.id %}"
-                               class="btn btn-sm btn-outline-danger">
-                                Respond
-                            </a>
+                            <a href="{% url 'donations:respond_to_appeal' request.id %}"
+                               class="btn btn-sm btn-outline-danger">Respond</a>
                         </div>
                     {% endfor %}
-                    <a href="{% url 'donations:appels_urgents' %}"
-                       class="btn btn-danger btn-sm w-100 mt-2">
-                        View All
-                    </a>
+                    <a href="{% url 'donations:urgent_appeals' %}" class="btn btn-danger btn-sm w-100 mt-2">View All</a>
                 {% else %}
-                    <p class="text-muted text-center py-3">
-                        No urgent calls right now.
-                    </p>
+                    <p class="text-muted text-center py-3">No urgent calls right now.</p>
                 {% endif %}
             </div>
         </div>
@@ -112,30 +87,24 @@
                 <h5 class="mb-0">Recent Donations</h5>
             </div>
             <div class="card-body">
-                {% if dons %}
-                    {% for don in dons|slice:":4" %}
+                {% if donations %}
+                    {% for donation in donations|slice:":4" %}
                         <div class="d-flex justify-content-between border-bottom py-2">
                             <div>
-                                <strong>{{ don.hopital.nom }}</strong>
-                                <small class="text-muted d-block">
-                                    {{ don.date_don }}
-                                </small>
+                                <strong>{{ donation.hospital.name }}</strong>
+                                <small class="text-muted d-block">{{ donation.donation_date }}</small>
                             </div>
-                            {% if don.valide %}
+                            {% if donation.validated %}
                                 <span class="badge bg-success">Validated</span>
                             {% else %}
                                 <span class="badge bg-secondary">Pending</span>
                             {% endif %}
                         </div>
                     {% endfor %}
-                    <a href="{% url 'donations:mes_dons' %}"
-                       class="btn btn-dark btn-sm w-100 mt-2">
-                        View All
-                    </a>
+                    <a href="{% url 'donations:my_donations' %}" class="btn btn-dark btn-sm w-100 mt-2">View All</a>
                 {% else %}
                     <p class="text-muted text-center py-3">No donations yet.</p>
-                    <a href="{% url 'donations:enregistrer_don' %}"
-                       class="btn btn-outline-danger w-100">
+                    <a href="{% url 'donations:register_donation' %}" class="btn btn-outline-danger w-100">
                         Record First Donation
                     </a>
                 {% endif %}
@@ -144,5 +113,28 @@
     </div>
 
 </div>
+
+{% if registrations %}
+<div class="card shadow mt-4">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">My Upcoming Campaigns</h5>
+    </div>
+    <div class="card-body">
+        {% for registration in registrations %}
+        <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+            <div>
+                <strong>{{ registration.campaign.name }}</strong><br>
+                <small class="text-muted">
+                    📅 {{ registration.campaign.date }} —
+                    📍 {{ registration.campaign.location }} —
+                    🕐 {{ registration.time_slot }}
+                </small>
+            </div>
+            <span class="badge bg-info">Registered</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
 
 {% endblock %}

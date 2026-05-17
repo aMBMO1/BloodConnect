@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h3 class="fw-bold mb-4"> My Responses</h3>
+<h3 class="fw-bold mb-4">My Responses</h3>
 
-{% if reponses %}
+{% if responses %}
     <div class="card shadow">
         <div class="table-responsive">
             <table class="table table-hover mb-0">
@@ -13,32 +13,26 @@
                         <th>Blood Type</th>
                         <th>My Response</th>
                         <th>Date</th>
-                        <th>Status</th>
+                        <th>Request Status</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for reponse in reponses %}
+                    {% for response in responses %}
                         <tr>
-                            <td>{{ reponse.demande.hopital.nom }}</td>
+                            <td>{{ response.request.hospital.name }}</td>
+                            <td><span class="badge bg-danger">{{ response.request.blood_type }}</span></td>
                             <td>
-                                <span class="badge bg-danger">
-                                    {{ reponse.demande.groupe_sanguin }}
-                                </span>
-                            </td>
-                            <td>
-                                {% if reponse.statut == 'confirmed' %}
+                                {% if response.status == 'confirmed' %}
                                     <span class="badge bg-success">Confirmed</span>
-                                {% elif reponse.statut == 'interested' %}
-                                    <span class="badge bg-warning text-dark">
-                                        Interested
-                                    </span>
+                                {% elif response.status == 'interested' %}
+                                    <span class="badge bg-warning text-dark">Interested</span>
                                 {% else %}
                                     <span class="badge bg-secondary">Declined</span>
                                 {% endif %}
                             </td>
-                            <td>{{ reponse.date_reponse|date:"d M Y" }}</td>
+                            <td>{{ response.response_date|date:"d M Y" }}</td>
                             <td>
-                                {% if reponse.demande.statut == 'active' %}
+                                {% if response.request.status == 'active' %}
                                     <span class="badge bg-success">Active</span>
                                 {% else %}
                                     <span class="badge bg-secondary">Closed</span>
@@ -53,11 +47,10 @@
 {% else %}
     <div class="text-center py-5">
         <h4 class="text-muted">No responses yet</h4>
-        <a href="{% url 'donations:appels_urgents' %}"
-           class="btn btn-danger mt-3">
-            View Urgent Calls
-        </a>
+        <a href="{% url 'donations:urgent_appeals' %}" class="btn btn-danger mt-3">View Urgent Calls</a>
     </div>
 {% endif %}
+
+<a href="{% url 'donations:dashboard' %}" class="btn btn-outline-secondary mt-3">← Back to Dashboard</a>
 
 {% endblock %}

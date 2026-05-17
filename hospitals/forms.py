@@ -1,38 +1,38 @@
 from django import forms
-from .models import Campagne, Inscription
-from donations.models import DemandeUrgente
+from .models import Campaign, Registration
+from donations.models import UrgentRequest
 from core.constants import BLOOD_TYPES
 
 
-class DemandeUrgenteForm(forms.ModelForm):
+class UrgentRequestForm(forms.ModelForm):
     class Meta:
-        model  = DemandeUrgente
-        fields = ['groupe_sanguin', 'quantite', 'delai', 'description']
+        model  = UrgentRequest
+        fields = ['blood_type', 'quantity', 'deadline', 'description']
         widgets = {
-            'groupe_sanguin': forms.Select(attrs={'class': 'form-select'}),
-            'quantite':       forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
-            'delai':          forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'description':    forms.Textarea(attrs={
+            'blood_type': forms.Select(attrs={'class': 'form-select'}),
+            'quantity':   forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+            'deadline':   forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'description': forms.Textarea(attrs={
                 'class': 'form-control', 'rows': 3, 'placeholder': 'Describe the urgency...'
             }),
         }
         labels = {
-            'groupe_sanguin': 'Blood Type Needed',
-            'quantite':       'Units (bags)',
-            'delai':          'Deadline',
-            'description':    'Description',
+            'blood_type': 'Blood Type Needed',
+            'quantity':   'Units (bags)',
+            'deadline':   'Deadline',
+            'description': 'Description',
         }
 
-    def clean_delai(self):
+    def clean_deadline(self):
         from datetime import date
-        delai = self.cleaned_data.get('delai')
-        if delai and delai <= date.today():
+        deadline = self.cleaned_data.get('deadline')
+        if deadline and deadline <= date.today():
             raise forms.ValidationError("Deadline must be a future date.")
-        return delai
+        return deadline
 
 
-class CampagneForm(forms.ModelForm):
-    groupes_cibles = forms.MultipleChoiceField(
+class CampaignForm(forms.ModelForm):
+    target_groups = forms.MultipleChoiceField(
         choices=BLOOD_TYPES,
         widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
         label='Targeted Blood Types',
@@ -40,40 +40,40 @@ class CampagneForm(forms.ModelForm):
     )
 
     class Meta:
-        model  = Campagne
-        fields = ['nom', 'date', 'lieu', 'groupes_cibles', 'capacite_totale']
+        model  = Campaign
+        fields = ['name', 'date', 'location', 'target_groups', 'total_capacity']
         widgets = {
-            'nom':            forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Campaign name'}),
-            'date':           forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'lieu':           forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Location'}),
-            'capacite_totale': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+            'name':     forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Campaign name'}),
+            'date':     forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Location'}),
+            'total_capacity': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
         }
         labels = {
-            'nom':            'Campaign Name',
-            'date':           'Date',
-            'lieu':           'Location',
-            'capacite_totale': 'Total Capacity',
+            'name':     'Campaign Name',
+            'date':     'Date',
+            'location': 'Location',
+            'total_capacity': 'Total Capacity',
         }
 
     def clean_date(self):
         from datetime import date
-        campagne_date = self.cleaned_data.get('date')
-        if campagne_date and campagne_date <= date.today():
+        campaign_date = self.cleaned_data.get('date')
+        if campaign_date and campaign_date <= date.today():
             raise forms.ValidationError("Campaign date must be in the future.")
-        return campagne_date
+        return campaign_date
 
-    def clean_groupes_cibles(self):
+    def clean_target_groups(self):
         # Returns a Python list — Django JSONField stores it automatically
-        return list(self.cleaned_data['groupes_cibles'])
+        return list(self.cleaned_data['target_groups'])
 
 
-class InscriptionCampagneForm(forms.ModelForm):
+class RegistrationCampaignForm(forms.ModelForm):
     class Meta:
-        model  = Inscription
-        fields = ['creneau_horaire']
+        model  = Registration
+        fields = ['time_slot']
         widgets = {
-            'creneau_horaire': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
+            'time_slot': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
         }
         labels = {
-            'creneau_horaire': 'Preferred Time Slot',
+            'time_slot': 'Preferred Time Slot',
         }

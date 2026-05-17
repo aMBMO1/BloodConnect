@@ -4,15 +4,15 @@ from . import views
 app_name = 'hospitals'
 
 urlpatterns = [
-    path('dashboard/',                                views.dashboard,          name='dashboard'),
-    path('demandes/creer/',                           views.creer_demande,      name='creer_demande'),
-    path('demandes/<int:demande_id>/',                views.voir_demande,       name='voir_demande'),
-    path('demandes/<int:demande_id>/modifier/',       views.modifier_demande,   name='modifier_demande'),
-    path('demandes/<int:demande_id>/cloturer/',       views.cloturer_demande,   name='cloturer_demande'),
-    path('campagnes/',                                views.liste_campagnes,    name='liste_campagnes'),
-    path('campagnes/creer/',                          views.creer_campagne,     name='creer_campagne'),
-    path('campagnes/<int:campagne_id>/',              views.detail_campagne,    name='detail_campagne'),
-    path('campagnes/<int:campagne_id>/inscrire/',     views.inscrire_campagne,  name='inscrire_campagne'),
-    path('campagnes/<int:campagne_id>/modifier/',     views.modifier_campagne,  name='modifier_campagne'),   # ✅ new
-    path('campagnes/<int:campagne_id>/supprimer/',    views.supprimer_campagne, name='supprimer_campagne'),  # ✅ new
+    path('dashboard/',                                  views.dashboard,            name='dashboard'),
+    path('requests/create/',                            views.create_request,       name='create_request'),
+    path('requests/<int:request_id>/',                  views.view_request,         name='view_request'),
+    path('requests/<int:request_id>/modify/',           views.modify_request,       name='modify_request'),
+    path('requests/<int:request_id>/close/',            views.close_request,        name='close_request'),
+    path('campaigns/',                                  views.campaign_list,        name='campaign_list'),
+    path('campaigns/create/',                           views.create_campaign,      name='create_campaign'),
+    path('campaigns/<int:campaign_id>/',                views.campaign_detail,      name='campaign_detail'),
+    path('campaigns/<int:campaign_id>/register/',       views.register_campaign,    name='register_campaign'),
+    path('campaigns/<int:campaign_id>/modify/',         views.modify_campaign,      name='modify_campaign'),
+    path('campaigns/<int:campaign_id>/delete/',         views.delete_campaign,      name='delete_campaign'),
 ]

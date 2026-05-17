@@ -6,78 +6,78 @@ from django.contrib import messages
 from django.views.decorators.http import require_POST
 
 from .forms import (
-    DonneurRegistrationForm,
-    HopitalRegistrationForm,
+    DonorRegistrationForm,
+    HospitalRegistrationForm,
     LoginForm,
-    EditDonneurForm,
-    EditHopitalForm,        
+    EditDonorForm,
+    EditHospitalForm,        
 )
-from .models import Donneur, Hopital
+from .models import Donor, Hospital
 
 
 def home(request):
     return render(request, 'core/home.html')
 
 
-def register_donneur(request):
+def register_donor(request):
     if request.user.is_authenticated:
         return redirect('core:home')
     if request.method == 'POST':
-        form = DonneurRegistrationForm(request.POST)
+        form = DonorRegistrationForm(request.POST)
         if form.is_valid():
-            donneur = form.save()
-            login(request, donneur.user)
+            donor = form.save()
+            login(request, donor.user)
             messages.success(request, 'Account created! Welcome!')
             return redirect('donations:dashboard')
     else:
-        form = DonneurRegistrationForm()
-    return render(request, 'core/register_donneur.html', {'form': form})
+        form = DonorRegistrationForm()
+    return render(request, 'core/register_donor.html', {'form': form})
 
 
-def register_hopital(request):
+def register_hospital(request):
     if request.user.is_authenticated:
         return redirect('core:home')
     if request.method == 'POST':
-        form = HopitalRegistrationForm(request.POST)
+        form = HospitalRegistrationForm(request.POST)
         if form.is_valid():
-            hopital = form.save()
-            login(request, hopital.user)
+            hospital = form.save()
+            login(request, hospital.user)
             messages.warning(request, 'Account created! Waiting for admin validation.')
             return redirect('hospitals:dashboard')
     else:
-        form = HopitalRegistrationForm()
-    return render(request, 'core/register_hopital.html', {'form': form})
+        form = HospitalRegistrationForm()
+    return render(request, 'core/register_hospital.html', {'form': form})
 
 
 @login_required
 def profile(request):
     user = request.user
-    if hasattr(user, 'donneur'):
-        donneur = user.donneur
+    if hasattr(user, 'donor'):
+        donor = user.donor
         if request.method == 'POST':
-            form = EditDonneurForm(request.POST, instance=donneur)
+            form = EditDonorForm(request.POST, instance=donor)
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Profile updated!')
                 return redirect('core:profile')
         else:
-            form = EditDonneurForm(instance=donneur)
-        return render(request, 'core/profile_donneur.html', {
-            'donneur': donneur,
+            form = EditDonorForm(instance=donor)
+        return render(request, 'core/profile_donor.html', {
+            'donor': donor,
             'form':    form,
         })
-    elif hasattr(user, 'hopital'):
-        hopital = user.hopital
+    elif hasattr(user, 'hospital'):
+        hospital = user.hospital
         if request.method == 'POST':
-            form = EditHopitalForm(request.POST, instance=hopital)
+            form = EditHospitalForm(request.POST, instance=hospital)
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Profile updated!')
                 return redirect('core:profile')
         else:
-            form = EditHopitalForm(instance=hopital)
-        return render(request, 'core/profile_hopital.html', {
-            'hopital': hopital,
+            form = EditHospitalForm(instance=hospital)
+        return render(request, 'core/profile_hospital.html', {
+            'hospital': hospital,
             'form':    form,
         })
     else:
@@ -86,15 +86,15 @@ def profile(request):
 
 @login_required
 @require_POST  
-def toggle_actif(request):
+def toggle_active(request):
     """Allow a donor to deactivate/reactivate their own account."""
-    if not hasattr(request.user, 'donneur'):
+    if not hasattr(request.user, 'donor'):
         messages.error(request, 'Not a donor account.')
         return redirect('core:home')
-    donneur       = request.user.donneur
-    donneur.actif = not donneur.actif
-    donneur.save()
-    status = 'activated' if donneur.actif else 'deactivated'
+    donor       = request.user.donor
+    donor.active = not donor.active
+    donor.save()
+    status = 'activated' if donor.active else 'deactivated'
     messages.success(request, f'Your account has been {status}.')
     return redirect('core:profile')
 
@@ -111,9 +111,9 @@ def user_login(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, f'Welcome back, {user.username}!')
-                if hasattr(user, 'donneur'):
+                if hasattr(user, 'donor'):
                     return redirect('donations:dashboard')
-                elif hasattr(user, 'hopital'):
+                elif hasattr(user, 'hospital'):
                     return redirect('hospitals:dashboard')
                 elif user.is_superuser:
                     return redirect('admin_panel:dashboard')

@@ -1,6 +1,6 @@
 # donations/utils.py
 from datetime import date, timedelta
-from .models import Don
+from .models import Donation
 
 
 # Number of days a donor must wait before donating again
@@ -23,38 +23,38 @@ COMPATIBILITY = {
 }
 
 
-def get_last_don(donneur):
-    return Don.objects.filter(
-        donneur=donneur
-    ).order_by('-date_don').first()  
+def get_last_donation(donor):
+    return Donation.objects.filter(
+        donor=donor
+    ).order_by('-donation_date').first()  
 
 
-def get_next_eligible_date(donneur):
+def get_next_eligible_date(donor):
     """
     Return the date the donor is next eligible to donate.
     Returns today's date if they have never donated (i.e. eligible now).
     """
-    last_don = get_last_don(donneur)
-    if last_don is None:
+    last_donation = get_last_donation(donor)
+    if last_donation is None:
         return date.today()
-    wait_days = ELIGIBILITY_DAYS.get(donneur.sexe, 56)
-    return last_don.date_don + timedelta(days=wait_days)
+    wait_days = ELIGIBILITY_DAYS.get(donor.gender, 56)
+    return last_donation.donation_date + timedelta(days=wait_days)
 
 
-def is_eligible(donneur):
+def is_eligible(donor):
     """
     Return True if the donor is allowed to donate today:
     - Their account must be active
     - The waiting period since their last donation must have passed
     """
-    if not donneur.actif:
+    if not donor.active:
         return False
-    return date.today() >= get_next_eligible_date(donneur)
+    return date.today() >= get_next_eligible_date(donor)
 
 
 def get_compatible_blood_types(blood_type):
     """
     Given a donor's blood type, return the list of blood types
-    they are compatible with (i.e. the demandes they can respond to).
+    they are compatible with (i.e. the requests they can respond to).
     """
     return COMPATIBILITY.get(blood_type, [])

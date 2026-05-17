@@ -4,41 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BloodConnect</title>
-    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
 
-<!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
     <div class="container">
         <a class="navbar-brand fw-bold" href="{% url 'core:home' %}">
             🩸 BloodConnect
         </a>
         <div class="navbar-nav ms-auto">
-        {% if user.is_authenticated %}
-    <div class="d-flex align-items-center gap-3">
-        <a class="nav-link text-white p-0" href="{% url 'core:profile' %}">
-            👤 {{ user.username }}
-        </a>
-        <form method="post" action="{% url 'core:logout' %}" class="m-0 p-0">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-outline-light btn-sm">
-                Logout
-            </button>
-        </form>
-    </div>
-{% else %}
-    <a class="nav-link text-white" href="{% url 'core:login' %}">Login</a>
-    <a class="nav-link text-white" href="{% url 'core:register_donneur' %}">Register</a>
-{% endif %}
+            {% if user.is_authenticated %}
+                <div class="d-flex align-items-center gap-3">
+                    <a class="nav-link text-white p-0" href="{% url 'core:profile' %}">
+                        👤 {{ user.username }}
+                    </a>
+                    <form method="post" action="{% url 'core:logout' %}" class="m-0 p-0">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-light btn-sm">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <a class="nav-link text-white" href="{% url 'core:login' %}">Login</a>
+                <a class="nav-link text-white" href="{% url 'core:register_donor' %}">Register</a>
+            {% endif %}
         </div>
     </div>
 </nav>
 
-<!-- FLASH MESSAGES -->
 <div class="container mt-3">
     {% for message in messages %}
         <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
@@ -48,7 +44,6 @@
     {% endfor %}
 </div>
 
-<!-- MAIN CONTENT -->
 <main class="container mt-4">
     {% block content %}
     {% endblock %}
@@ -56,12 +51,11 @@
 
 <footer class="bg-danger text-white text-center py-3 mt-5">
     <p class="mb-0">BloodConnect — Saving lives together</p>
-      <p>
-    <a href="{% url 'issues:report_issue' %}" style="color: red; font-weight: bold;">Report Issues</a>
-  </p>
+    <p>
+        <a href="{% url 'issues:report_issue' %}" style="color: white; font-weight: bold;">Report Issues</a>
+    </p>
 </footer>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

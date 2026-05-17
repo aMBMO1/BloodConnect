@@ -1,45 +1,45 @@
 from django import forms
-from .models import Don, ReponseAppel
-from core.models import Hopital
+from .models import Donation, AppealResponse
+from core.models import Hospital
 
 
-class DonForm(forms.ModelForm):
+class DonationForm(forms.ModelForm):
     class Meta:
-        model  = Don
-        fields = ['hopital', 'date_don', 'notes']
+        model  = Donation
+        fields = ['hospital', 'donation_date', 'notes']
         widgets = {
-            'hopital':  forms.Select(attrs={'class': 'form-select'}),
-            'date_don': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'hospital':  forms.Select(attrs={'class': 'form-select'}),
+            'donation_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'notes':    forms.Textarea(attrs={
                 'class': 'form-control', 'rows': 3, 'placeholder': 'Notes (optional)'
             }),
         }
         labels = {
-            'hopital':  'Hospital',
-            'date_don': 'Donation Date',
+            'hospital':  'Hospital',
+            'donation_date': 'Donation Date',
             'notes':    'Notes',
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Only show validated hospitals in the dropdown
-        self.fields['hopital'].queryset = Hopital.objects.filter(valide=True)
+        self.fields['hospital'].queryset = Hospital.objects.filter(validated=True)
 
-    def clean_date_don(self):
+    def clean_donation_date(self):
         from datetime import date
-        date_don = self.cleaned_data.get('date_don')
-        if date_don and date_don > date.today():
+        donation_date = self.cleaned_data.get('donation_date')
+        if donation_date and donation_date > date.today():
             raise forms.ValidationError("Donation date cannot be in the future.")
-        return date_don
+        return donation_date
 
 
-class ReponseAppelForm(forms.ModelForm):
+class AppealResponseForm(forms.ModelForm):
     class Meta:
-        model  = ReponseAppel
-        fields = ['statut']
+        model  = AppealResponse
+        fields = ['status']
         widgets = {
-            'statut': forms.Select(attrs={'class': 'form-select'}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
         }
         labels = {
-            'statut': 'Your Response',
+            'status': 'Your Response',
         }

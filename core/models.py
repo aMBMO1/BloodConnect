@@ -4,39 +4,39 @@ from django.contrib.auth.models import User
 from .constants import BLOOD_TYPES
 
 
-class Donneur(models.Model):
+class Donor(models.Model):
     GENDER_CHOICES = [
         ('M', 'Male'),
         ('F', 'Female'),
     ]
 
-    user           = models.OneToOneField(User, on_delete=models.CASCADE, related_name='donneur')
-    groupe_sanguin = models.CharField(max_length=3, choices=BLOOD_TYPES)
-    sexe           = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    date_naissance = models.DateField()
-    ville          = models.CharField(max_length=100)
-    actif          = models.BooleanField(default=True)
+    user       = models.OneToOneField(User, on_delete=models.CASCADE, related_name='donor')
+    blood_type = models.CharField(max_length=3, choices=BLOOD_TYPES)
+    gender     = models.CharField(max_length=1, choices=GENDER_CHOICES)
+    date_of_birth = models.DateField()
+    city       = models.CharField(max_length=100)
+    active     = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.user.username} ({self.groupe_sanguin})"
+        return f"{self.user.username} ({self.blood_type})"
 
     class Meta:
-        verbose_name        = "Donneur"
-        verbose_name_plural = "Donneurs"
+        verbose_name        = "Donor"
+        verbose_name_plural = "Donors"
 
 
-class Hopital(models.Model):
-    user       = models.OneToOneField(User, on_delete=models.CASCADE, related_name='hopital')
-    nom        = models.CharField(max_length=200)
-    adresse    = models.TextField()
-    ville      = models.CharField(max_length=100)
-    agrement   = models.CharField(max_length=100, unique=True)
-    valide     = models.BooleanField(default=False)
+class Hospital(models.Model):
+    user       = models.OneToOneField(User, on_delete=models.CASCADE, related_name='hospital')
+    name       = models.CharField(max_length=200)
+    address    = models.TextField()
+    city       = models.CharField(max_length=100)
+    approval   = models.CharField(max_length=100, unique=True)
+    validated  = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.nom
+        return self.name
 
     class Meta:
-        verbose_name        = "Hopital"
-        verbose_name_plural = "Hopitaux"
+        verbose_name        = "Hospital"
+        verbose_name_plural = "Hospitals"

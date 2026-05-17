@@ -1,22 +1,22 @@
 from django.contrib import admin
-from .models import Donneur, Hopital
+from .models import Donor, Hospital
 
 
-@admin.register(Donneur)
-class DonneurAdmin(admin.ModelAdmin):
-    list_display  = ['user', 'groupe_sanguin', 'sexe', 'ville', 'actif']
-    list_filter   = ['groupe_sanguin', 'ville', 'actif', 'sexe']
-    search_fields = ['user__username', 'ville']
+@admin.register(Donor)
+class DonorAdmin(admin.ModelAdmin):
+    list_display  = ['user', 'blood_type', 'gender', 'city', 'active']
+    list_filter   = ['blood_type', 'city', 'active', 'gender']
+    search_fields = ['user__username', 'city']
 
 
-@admin.register(Hopital)
-class HopitalAdmin(admin.ModelAdmin):
-    list_display  = ['nom', 'ville', 'agrement', 'valide']
-    list_filter   = ['valide', 'ville']
-    search_fields = ['nom', 'agrement']
+@admin.register(Hospital)
+class HospitalAdmin(admin.ModelAdmin):
+    list_display  = ['name', 'city', 'approval', 'validated']
+    list_filter   = ['validated', 'city']
+    search_fields = ['name', 'approval']
     actions       = ['validate_hospitals']
 
     def validate_hospitals(self, request, queryset):
-        queryset.update(valide=True)
+        queryset.update(validated=True)
         self.message_user(request, "Selected hospitals validated!")
     validate_hospitals.short_description = "Validate selected hospitals"

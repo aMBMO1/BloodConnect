@@ -8,11 +8,11 @@
             </div>
             <div class="card-body text-center">
                 <p class="mb-1">Are you sure you want to delete this donation?</p>
-                <p class="fw-bold">{{ don.hopital.nom }} — {{ don.date_don }}</p>
+                <p class="fw-bold">{{ donation.hospital.name }} — {{ donation.donation_date }}</p>
                 <form method="post" class="d-flex justify-content-center gap-2 mt-3">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger">Yes, Delete</button>
-                    <a href="{% url 'donations:mes_dons' %}" class="btn btn-outline-secondary">Cancel</a>
+                    <a href="{% url 'donations:my_donations' %}" class="btn btn-outline-secondary">Cancel</a>
                 </form>
             </div>
         </div>

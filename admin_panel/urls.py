@@ -5,12 +5,12 @@ from . import views
 app_name = 'admin_panel'
 
 urlpatterns = [
-    path('',                                   views.dashboard,           name='dashboard'),
-    path('hopitaux/',                          views.hopitaux_list,       name='hopitaux_list'),
-    path('hopitaux/<int:hopital_id>/valider/', views.valider_hopital,     name='valider_hopital'),
-    path('hopitaux/<int:hopital_id>/rejeter/', views.rejeter_hopital,     name='rejeter_hopital'),
-    path('donneurs/',                          views.donneurs_list,       name='donneurs_list'),
-    path('donneurs/export-csv/',               views.export_donneurs_csv, name='export_donneurs_csv'),
-    path('dons/<int:don_id>/valider/',         views.valider_don,         name='valider_don'),
-    path('campagnes/', views.campagnes_list, name='campagnes_list'),
-     ]
+    path('',                                        views.dashboard,             name='dashboard'),
+    path('hospitals/',                             views.hospitals_list,        name='hospitals_list'),
+    path('hospitals/<int:hospital_id>/validate/',  views.validate_hospital,     name='validate_hospital'),
+    path('hospitals/<int:hospital_id>/reject/',    views.reject_hospital,       name='reject_hospital'),
+    path('donors/',                                views.donors_list,           name='donors_list'),
+    path('donors/export-csv/',                     views.export_donors_csv,     name='export_donors_csv'),
+path('donations/<int:donation_id>/validate/',  views.validate_donation, name='validate_donation'),
+    path('campaigns/',                             views.campaigns_list,        name='campaigns_list'),
+]

@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h3 class="fw-bold mb-4"> {{ hopital.nom }}</h3>
+<h3 class="fw-bold mb-4">{{ hospital.name }}</h3>
 
-{% if not hopital.valide %}
+{% if not hospital.validated %}
     <div class="alert alert-warning">
         Pending admin validation. Cannot post requests yet.
     </div>
@@ -13,7 +13,7 @@
     <div class="col-md-4">
         <div class="card shadow text-center border-danger">
             <div class="card-body">
-                <h2 class="text-danger fw-bold">{{ demandes_actives }}</h2>
+                <h2 class="text-danger fw-bold">{{ active_requests }}</h2>
                 <p class="text-muted mb-0">Active Requests</p>
             </div>
         </div>
@@ -21,7 +21,7 @@
     <div class="col-md-4">
         <div class="card shadow text-center border-primary">
             <div class="card-body">
-                <h2 class="text-primary fw-bold">{{ campagnes.count }}</h2>
+                <h2 class="text-primary fw-bold">{{ campaigns|length }}</h2>
                 <p class="text-muted mb-0">Campaigns</p>
             </div>
         </div>
@@ -29,7 +29,7 @@
     <div class="col-md-4">
         <div class="card shadow text-center border-success">
             <div class="card-body">
-                <h2 class="text-success fw-bold">{{ total_reponses }}</h2>
+                <h2 class="text-success fw-bold">{{ total_responses }}</h2>
                 <p class="text-muted mb-0">Total Responses</p>
             </div>
         </div>
@@ -40,18 +40,14 @@
 
     <div class="col-md-7">
         <div class="card shadow">
-            <div class="card-header bg-danger text-white
-                        d-flex justify-content-between align-items-center">
+            <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Urgent Requests</h5>
-                {% if hopital.valide %}
-                    <a href="{% url 'hospitals:creer_demande' %}"
-                       class="btn btn-light btn-sm text-danger">
-                        + New
-                    </a>
+                {% if hospital.validated %}
+                    <a href="{% url 'hospitals:create_request' %}" class="btn btn-light btn-sm text-danger">+ New</a>
                 {% endif %}
             </div>
             <div class="card-body p-0">
-                {% if demandes %}
+                {% if requests %}
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead class="table-light">
@@ -64,40 +60,26 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for demande in demandes %}
+                                {% for request in requests %}
                                     <tr>
+                                        <td><span class="badge bg-danger">{{ request.blood_type }}</span></td>
+                                        <td>{{ request.quantity }}</td>
+                                        <td>{{ request.deadline }}</td>
                                         <td>
-                                            <span class="badge bg-danger">
-                                                {{ demande.groupe_sanguin }}
-                                            </span>
-                                        </td>
-                                        <td>{{ demande.quantite }}</td>
-                                        <td>{{ demande.delai }}</td>
-                                        <td>
-                                            {% if demande.statut == 'active' %}
-                                                <span class="badge bg-success">
-                                                    Active
-                                                </span>
+                                            {% if request.status == 'active' %}
+                                                <span class="badge bg-success">Active</span>
                                             {% else %}
-                                                <span class="badge bg-secondary">
-                                                    Closed
-                                                </span>
+                                                <span class="badge bg-secondary">Closed</span>
                                             {% endif %}
                                         </td>
                                         <td>
-                                            <a href="{% url 'hospitals:voir_demande' demande.id %}"
-                                               class="btn btn-sm btn-outline-primary">
-                                                View
-                                            </a>
-                                            {% if demande.statut == 'active' %}
-                                                <a href="{% url 'hospitals:modifier_demande' demande.id %}"
-                                                   class="btn btn-sm btn-outline-warning">
-                                                    Edit
-                                                </a>
-                                                <a href="{% url 'hospitals:cloturer_demande' demande.id %}"
-                                                   class="btn btn-sm btn-outline-danger">
-                                                    Close
-                                                </a>
+                                            <a href="{% url 'hospitals:view_request' request.id %}"
+                                               class="btn btn-sm btn-outline-primary">View</a>
+                                            {% if request.status == 'active' %}
+                                                <a href="{% url 'hospitals:modify_request' request.id %}"
+                                                   class="btn btn-sm btn-outline-warning">Edit</a>
+                                                <a href="{% url 'hospitals:close_request' request.id %}"
+                                                   class="btn btn-sm btn-outline-danger">Close</a>
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -114,37 +96,31 @@
 
     <div class="col-md-5">
         <div class="card shadow">
-            <div class="card-header bg-primary text-white
-                        d-flex justify-content-between align-items-center">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Campaigns</h5>
-                {% if hopital.valide %}
-                    <a href="{% url 'hospitals:creer_campagne' %}"
-                       class="btn btn-light btn-sm text-primary">
-                        + New
-                    </a>
+                {% if hospital.validated %}
+                    <a href="{% url 'hospitals:create_campaign' %}" class="btn btn-light btn-sm text-primary">+ New</a>
                 {% endif %}
             </div>
             <div class="card-body">
-                {% if campagnes %}
-                    {% for campagne in campagnes %}
+                {% if campaigns %}
+                    {% for campaign in campaigns %}
                         <div class="border-bottom py-2">
                             <div class="d-flex justify-content-between">
-                                <strong>{{ campagne.nom }}</strong>
-                                <small class="text-muted">{{ campagne.date }}</small>
+                                <strong>{{ campaign.name }}</strong>
+                                <small class="text-muted">{{ campaign.date }}</small>
                             </div>
                             <small class="text-muted">
-                                {{ campagne.lieu }} |
-                                {{ campagne.inscriptions.count }}/{{ campagne.capacite_totale }}
+                                {{ campaign.location }} |
+                                {{ campaign.registrations.count }}/{{ campaign.total_capacity }}
                             </small>
                             <div class="mt-1">
-                                <a href="{% url 'hospitals:detail_campagne' campagne.id %}"
-                                   class="btn btn-sm btn-outline-primary">
-                                    Details
-                                </a>
-<a href="{% url 'hospitals:modifier_campagne' campagne.id %}"
-   class="btn btn-sm btn-outline-primary">✏️ Edit</a>
-<a href="{% url 'hospitals:supprimer_campagne' campagne.id %}"
-   class="btn btn-sm btn-outline-danger">🗑️ Delete</a>
+                                <a href="{% url 'hospitals:campaign_detail' campaign.id %}"
+                                   class="btn btn-sm btn-outline-primary">Details</a>
+                                <a href="{% url 'hospitals:modify_campaign' campaign.id %}"
+                                   class="btn btn-sm btn-outline-warning">✏️ Edit</a>
+                                <a href="{% url 'hospitals:delete_campaign' campaign.id %}"
+                                   class="btn btn-sm btn-outline-danger">🗑️ Delete</a>
                             </div>
                         </div>
                     {% endfor %}
