@@ -63,7 +63,6 @@ class CampaignForm(forms.ModelForm):
         return campaign_date
 
     def clean_target_groups(self):
-        # Returns a Python list — Django JSONField stores it automatically
         return list(self.cleaned_data['target_groups'])
 
 

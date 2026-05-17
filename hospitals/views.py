@@ -1,4 +1,3 @@
-# hospitals/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -152,7 +151,6 @@ def register_campaign(request, campaign_id):
     donor    = request.user.donor
     campaign = get_object_or_404(Campaign, id=campaign_id)
 
-    # ✅ check blood type on BOTH GET and POST
     if donor.blood_type not in campaign.target_groups:
         messages.error(request, 'Your blood type is not targeted by this campaign.')
         return redirect('hospitals:campaign_list')
@@ -199,8 +197,6 @@ def campaign_list(request):
         filled  = campaign.filled
         percent = int((filled / total) * 100) if total > 0 else 0
 
-        # ✅ FIX: campaign is compatible if it's asking for THIS donor's blood type
-        # Not whether the donor can donate to others
         compatible = (
             donor.blood_type in campaign.target_groups
             if donor else True
@@ -230,7 +226,6 @@ def modify_campaign(request, campaign_id):
             messages.success(request, 'Campaign updated!')
             return redirect('hospitals:campaign_detail', campaign_id=campaign.id)
     else:
-        # ✅ pre-check the existing blood types in the checkboxes
         form = CampaignForm(
             instance=campaign,
             initial={'target_groups': campaign.target_groups}

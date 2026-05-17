@@ -1,4 +1,3 @@
-# donations/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -32,7 +31,7 @@ def dashboard(request):
     ).order_by('-created_at')
 
     registrations = donor.registrations.select_related('campaign').filter(
-    campaign__date__gte=date.today()   # ✅ only future campaigns
+    campaign__date__gte=date.today()  
 ).order_by('campaign__date')
 
     context = {

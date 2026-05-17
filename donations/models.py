@@ -1,4 +1,3 @@
-# donations/models.py
 from django.db import models
 from core.models import Donor, Hospital
 from core.constants import BLOOD_TYPES

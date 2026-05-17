@@ -22,7 +22,6 @@ class DonationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Only show validated hospitals in the dropdown
         self.fields['hospital'].queryset = Hospital.objects.filter(validated=True)
 
     def clean_donation_date(self):

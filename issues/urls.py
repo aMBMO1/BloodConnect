@@ -1,10 +1,8 @@
-# issues/urls.py
 from django.urls import path
 from .views import IssueCreateView, IssueListView
 from django.views.generic import TemplateView
 
-app_name = "issues"   # <-- add this line
-
+app_name = "issues"   
 urlpatterns = [
     path('report/', IssueCreateView.as_view(), name='report_issue'),
     path('list/', IssueListView.as_view(), name='issue_list'),

@@ -1,4 +1,3 @@
-# core/views.py
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -126,7 +125,7 @@ def user_login(request):
     return render(request, 'core/login.html', {'form': form})
 
 
-@require_POST  # ✅ FIX: secure logout
+@require_POST  
 def user_logout(request):
     logout(request)
     messages.success(request, 'Logged out!')
