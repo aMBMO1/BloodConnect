@@ -98,7 +98,7 @@ def urgent_appeals(request):
 
     has_active_response = AppealResponse.objects.filter(
         donor=donor,
-        status='interested',
+        status__in=['interested', 'confirmed'],
         request__status='active'
     ).exists()
 
@@ -136,7 +136,7 @@ def respond_to_appeal(request, request_id):
         return redirect('donations:urgent_appeals')
     active_response = AppealResponse.objects.filter(
         donor=donor,
-        status='interested',
+        status__in=['interested', 'confirmed'],
         request__status='active'
     ).exists()
     if active_response:
