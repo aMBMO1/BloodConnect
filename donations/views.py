@@ -95,11 +95,19 @@ def urgent_appeals(request):
     already_responded = AppealResponse.objects.filter(
         donor=donor
     ).values_list('request_id', flat=True)
+
+    has_active_response = AppealResponse.objects.filter(
+        donor=donor,
+        status='interested',
+        request__status='active'
+    ).exists()
+
     return render(request, 'donations/urgent_appeals.html', {
         'requests':           requests,
         'donor':              donor,
         'already_responded':  already_responded,
         'is_eligible':        is_eligible(donor),
+        'has_active_response': has_active_response
     })
 
 
@@ -125,6 +133,14 @@ def respond_to_appeal(request, request_id):
 
     if urgent_request.status != 'active':
         messages.error(request, 'This request is closed.')
+        return redirect('donations:urgent_appeals')
+    active_response = AppealResponse.objects.filter(
+        donor=donor,
+        status='interested',
+        request__status='active'
+    ).exists()
+    if active_response:
+        messages.error(request, 'You already responded to an active request. Please wait until it is resolved before responding to another one.')
         return redirect('donations:urgent_appeals')
 
     if request.method == 'POST':

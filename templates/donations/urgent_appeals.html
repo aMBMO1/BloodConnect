@@ -28,11 +28,13 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">{{ request.quantity }} units needed</span>
                             {% if request.id in already_responded %}
-                                <span class="badge bg-success">Responded ✓</span>
-                            {% else %}
-                                <a href="{% url 'donations:respond_to_appeal' request.id %}"
-                                   class="btn btn-danger btn-sm">Respond</a>
-                            {% endif %}
+    <span class="badge bg-success">Responded ✓</span>
+{% elif has_active_response %}
+    <span class="badge bg-warning text-dark">Busy with another request</span>
+{% else %}
+    <a href="{% url 'donations:respond_to_appeal' request.id %}"
+       class="btn btn-danger btn-sm">Respond</a>
+{% endif %}
                         </div>
                     </div>
                 </div>
