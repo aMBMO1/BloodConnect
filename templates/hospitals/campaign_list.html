@@ -50,17 +50,23 @@
                         </div>
 
                         {% if item.compatible %}
-                            {% if not item.is_full %}
-                                <a href="{% url 'hospitals:register_campaign' item.obj.id %}"
-                                   class="btn btn-danger w-100">Register</a>
-                            {% else %}
-                                <button class="btn btn-secondary w-100" disabled>Full</button>
-                            {% endif %}
-                        {% else %}
-                            <button class="btn btn-outline-secondary w-100" disabled>
-                                Not compatible with your blood type
-                            </button>
-                        {% endif %}
+    {% if not item.is_full %}
+        {% if is_eligible %}
+            <a href="{% url 'hospitals:register_campaign' item.obj.id %}"
+               class="btn btn-danger w-100">Register</a>
+        {% else %}
+            <button class="btn btn-warning w-100" disabled>
+                Not eligible yet — {{ next_date }}
+            </button>
+        {% endif %}
+    {% else %}
+        <button class="btn btn-secondary w-100" disabled>Full</button>
+    {% endif %}
+{% else %}
+    <button class="btn btn-outline-secondary w-100" disabled>
+        Not compatible with your blood type
+    </button>
+{% endif %}
                     </div>
                 </div>
             </div>

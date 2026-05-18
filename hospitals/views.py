@@ -8,7 +8,7 @@ from .models import Campaign, Registration
 from .forms  import UrgentRequestForm, CampaignForm, RegistrationCampaignForm
 from donations.models import UrgentRequest, AppealResponse
 from core.models import Hospital, Donor
-from donations.utils import get_compatible_blood_types
+from donations.utils import is_eligible, get_next_eligible_date
 
 
 def get_hospital_or_redirect(request):
@@ -155,6 +155,12 @@ def register_campaign(request, campaign_id):
         messages.error(request, 'Your blood type is not targeted by this campaign.')
         return redirect('hospitals:campaign_list')
 
+    from donations.utils import is_eligible, get_next_eligible_date
+    if not is_eligible(donor):
+        next_date = get_next_eligible_date(donor)
+        messages.error(request, f'You are not eligible to donate yet. Next eligible date: {next_date}')
+        return redirect('hospitals:campaign_list')
+
     if Registration.objects.filter(campaign=campaign, donor=donor).exists():
         messages.warning(request, 'Already registered!')
         return redirect('hospitals:campaign_list')
@@ -190,6 +196,9 @@ def campaign_list(request):
     ).order_by('date')
 
     donor = getattr(request.user, 'donor', None)
+    eligible    = is_eligible(donor) if donor else False
+    next_date   = get_next_eligible_date(donor) if donor else None
+
 
     campaigns = []
     for campaign in campaigns_raw:
@@ -212,7 +221,7 @@ def campaign_list(request):
             'compatible': compatible,
         })
 
-    return render(request, 'hospitals/campaign_list.html', {'campaigns': campaigns})
+    return render(request, 'hospitals/campaign_list.html', {'campaigns': campaigns , 'is_eligible': eligible,'next_date':   next_date,})
 @login_required
 def modify_campaign(request, campaign_id):
     hospital, redir = get_hospital_or_redirect(request)
